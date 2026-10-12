@@ -1,0 +1,10 @@
+
+.appointment-alert {
+  margin: 12px 20px;
+  padding: 12px 16px;
+  border: 1px solid #eab308;
+  border-radius: 8px;
+  background: #fef9c3;
+  color: #713f12;
+  font-weight: 500;
+}

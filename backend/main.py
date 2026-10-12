@@ -2,7 +2,6 @@
 import os
 from datetime import datetime
 from typing import Literal
-
 from dotenv import load_dotenv
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
@@ -15,6 +14,7 @@ from database import (
     delete_appointment,
     list_reminders,
     add_reminder,
+    delete_reminder,
 )
 from file_utils import extract_report_text, image_to_data_url
 from health_agent import (
@@ -22,6 +22,8 @@ from health_agent import (
     analyze_health_image,
     transcribe_audio,
 )
+from fastapi.middleware.cors import CORSMiddleware
+from reminder_manager import router as reminder_router
 
 load_dotenv()
 
@@ -34,6 +36,19 @@ app = FastAPI(
     ),
     version="1.0.0",
 )
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+app.include_router(reminder_router)
+
+
 
 frontend_origin = os.getenv(
     "FRONTEND_ORIGIN",
@@ -188,7 +203,12 @@ async def upload_report(
             "used_rag": False,
         }
     except Exception as exc:
-        safe_error(exc)
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(
+            status_code=500,
+            detail=f"Report processing failed: {str(exc)}"
+        )
 
 
 @app.post("/analyze-image")
@@ -311,18 +331,32 @@ def get_reminders():
     return {"reminders": list_reminders()}
 
 
+
+
 @app.post("/reminders")
 def create_reminder(request: ReminderRequest):
     reminder_id = add_reminder(
         request.medicine.strip(),
         request.schedule.strip(),
-        request.notes.strip(),
+        request.notes.strip()
     )
 
     return {
         "id": reminder_id,
-        "message": (
-            "Reminder saved. This stores the schedule but does not "
-            "send automatic notifications."
-        ),
+        "message": "Reminder added successfully"
     }
+
+    
+
+@app.delete("/reminders/{reminder_id}")
+def remove_reminder(reminder_id: int):
+    deleted = delete_reminder(reminder_id)
+
+    if not deleted:
+        raise HTTPException(
+            status_code=404,
+            detail="Reminder not found"
+        )
+
+    return {"message": "Reminder deleted successfully"}
+

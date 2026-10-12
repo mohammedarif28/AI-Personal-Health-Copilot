@@ -1,4 +1,5 @@
 
+
 import sqlite3
 from pathlib import Path
 from contextlib import contextmanager
@@ -67,11 +68,21 @@ def add_appointment(doctor, appointment_date, notes=""):
 
 def delete_appointment(appointment_id):
     with get_db() as db:
+        print("Database file:", DB_PATH)
+
+        rows = db.execute(
+            "SELECT id FROM appointments WHERE id = ?",
+            (appointment_id,),
+        ).fetchall()
+
+        print("Matching appointment:", [dict(row) for row in rows])
+
         cursor = db.execute(
             "DELETE FROM appointments WHERE id = ?",
             (appointment_id,),
         )
 
+        print("Rows deleted:", cursor.rowcount)
         return cursor.rowcount > 0
 
 
@@ -92,3 +103,11 @@ def add_reminder(medicine, schedule, notes=""):
         """, (medicine, schedule, notes))
 
         return cursor.lastrowid
+
+def delete_reminder(reminder_id):
+    with get_db() as db:
+        cursor = db.execute(
+            "DELETE FROM reminders WHERE id = ?",
+            (reminder_id,)
+        )
+        return cursor.rowcount > 0
