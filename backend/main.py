@@ -29,6 +29,8 @@ from reminder_manager import router as reminder_router
 
 load_dotenv()
 
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+
 # --------------------------------------------------
 # FastAPI Application
 # --------------------------------------------------
