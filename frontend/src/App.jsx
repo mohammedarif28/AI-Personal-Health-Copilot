@@ -1,11 +1,8 @@
-import ReactMarkdown from "react-markdown";
-import { useAppointmentNotifications } from "./useAppointmentNotifications";
-import { useMedicineNotifications } from "./useMedicineNotifications";
-import remarkGfm from "remark-gfm";
 import React, { useEffect, useRef, useState } from "react";
-import Login from "./Login";
+import "./App.css";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { onAuthStateChanged, signOut } from "firebase/auth";
-import { auth } from "./firebase";
 import {
   Activity,
   Bot,
@@ -23,7 +20,14 @@ import {
   X,
   MessageSquare,
   LogOut,
+  Clock,
+  Eye,
+  HeartPulse,
 } from "lucide-react";
+
+import Login from "./Login";
+import { auth } from "./firebase";
+import { useAppointmentNotifications } from "./useAppointmentNotifications";
 
 const API_BASE = "http://127.0.0.1:8000";
 const STORAGE_KEY = "health-copilot-conversations-v1";
@@ -137,191 +141,34 @@ function getAnswer(data) {
 }
 
 export default function App() {
-   const {
+  const {
     permission,
     status,
     enableNotifications,
   } = useAppointmentNotifications();
+
+  // Declare activePage before any effect or function uses it.
+  const [activePage, setActivePage] = useState("chat");
+
+  const [medicalReports, setMedicalReports] = useState([]);
+  const [selectedReport, setSelectedReport] = useState(null);
+  const [reportsLoading, setReportsLoading] = useState(false);
+  const [reportsError, setReportsError] = useState("");
 
   const [user, setUser] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [showSignOutModal, setShowSignOutModal] = useState(false);
   const [isSigningOut, setIsSigningOut] = useState(false);
 
-  const getInitials = (name) => {
-    if (!name) return "U";
-    const parts = name.trim().split(/\s+/);
-    if (parts.length >= 2) {
-      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-    }
-    return parts[0].slice(0, 2).toUpperCase();
-  };
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(
-      auth,
-      (firebaseUser) => {
-        setUser(firebaseUser);
-        setAuthLoading(false);
-      },
-      () => {
-        setUser(null);
-        setAuthLoading(false);
-      }
-    );
-
-    return unsubscribe;
-  }, []);
-
-  const [initialChats] = useState(() => {
-    return loadSavedChats() || [createConversation()];
-  });
-  const [appointmentAlert, setAppointmentAlert] = useState("");
-
-
-  useEffect(() => {
-    let active = true;
-
-    async function checkAppointments() {
-      try {
-        const data = await apiRequest("/appointments");
-        const appointments = Array.isArray(data)
-          ? data
-          : data.appointments || [];
-
-        const now = Date.now();
-
-        for (const appointment of appointments) {
-          if (!appointment.appointment_date || appointment.id == null) {
-            continue;
-          }
-
-          const appointmentTime = new Date(
-            appointment.appointment_date
-          ).getTime();
-
-          if (!Number.isFinite(appointmentTime)) continue;
-
-          const minutesLeft = (appointmentTime - now) / 60000;
-
-          if (minutesLeft < 0 || minutesLeft > 10) continue;
-
-          const key = `appointment-alert-${appointment.id}`;
-
-          if (sessionStorage.getItem(key)) continue;
-
-          const text =
-            `Your appointment with ${appointment.doctor || "your doctor"} ` +
-            `is in ${Math.ceil(minutesLeft)} minute(s).`;
-
-          if (active) setAppointmentAlert(text);
-
-          if (
-            "Notification" in window &&
-            Notification.permission === "granted"
-          ) {
-            new Notification("Health Copilot Reminder", {
-              body: text,
-            });
-          }
-
-          sessionStorage.setItem(key, "shown");
-          break;
-        }
-      } catch (error) {
-        console.error("Appointment reminder error:", error);
-      }
-    }
-
-    checkAppointments();
-    const timer = window.setInterval(checkAppointments, 30000);
-
-    return () => {
-      active = false;
-      window.clearInterval(timer);
-    };
-  }, []);
-
-
-
-  useEffect(() => {
-    let shownAlerts = new Set();
-
-    async function checkAppointments() {
-      try {
-        const response = await fetch(`${API_BASE}/appointments`);
-        if (!response.ok) return;
-
-        const data = await response.json();
-        const appointments = data.appointments || [];
-        const now = Date.now();
-
-        for (const appointment of appointments) {
-          const appointmentTime = new Date(
-            appointment.appointment_date
-          ).getTime();
-
-          if (!Number.isFinite(appointmentTime)) continue;
-
-          const minutesLeft = (appointmentTime - now) / 60000;
-          const id = appointment.id ?? `${appointment.doctor}-${appointment.appointment_date}`;
-
-          let message = "";
-          let alertKey = "";
-
-          if (minutesLeft > 0 && minutesLeft <= 60) {
-            alertKey = `${id}-upcoming`;
-
-            if (!shownAlerts.has(alertKey)) {
-              const timeText =
-                minutesLeft >= 60
-                  ? "1 hour"
-                  : `${Math.ceil(minutesLeft)} minute(s)`;
-
-              message =
-                `Your appointment with ${appointment.doctor} ` +
-                `is in ${timeText}.`;
-            }
-          } else if (minutesLeft <= 0 && minutesLeft > -1) {
-            alertKey = `${id}-now`;
-
-            if (!shownAlerts.has(alertKey)) {
-              message =
-                `Your appointment with ${appointment.doctor} is now! ` +
-                `It's time for your appointment.`;
-            }
-          }
-
-          if (message && alertKey) {
-            shownAlerts.add(alertKey);
-            setAppointmentAlert(`🔔 ${message}`);
-
-            if (
-              "Notification" in window &&
-              Notification.permission === "granted"
-            ) {
-              new Notification("Health Copilot Reminder", {
-                body: message,
-              });
-            }
-          }
-        }
-      } catch (error) {
-        console.error("Appointment reminder error:", error);
-      }
-    }
-
-    checkAppointments();
-    const timer = setInterval(checkAppointments, 10000);
-
-    return () => clearInterval(timer);
-  }, []);
+  const [initialChats] = useState(
+    () => loadSavedChats() || [createConversation()]
+  );
 
   const [conversations, setConversations] = useState(initialChats);
   const [activeChatId, setActiveChatId] = useState(
     initialChats[0].id
   );
-  const [activePage, setActivePage] = useState("chat");
+
   const [language, setLanguage] = useState("Auto-detect");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
@@ -330,15 +177,16 @@ export default function App() {
 
   const [appointments, setAppointments] = useState([]);
   const [reminders, setReminders] = useState([]);
-
-  useMedicineNotifications(reminders);
+  const [appointmentAlert, setAppointmentAlert] = useState("");
 
   const [doctor, setDoctor] = useState("");
   const [appointmentDate, setAppointmentDate] = useState("");
   const [appointmentNotes, setAppointmentNotes] = useState("");
+
   const [medicine, setMedicine] = useState("");
   const [schedule, setSchedule] = useState("");
   const [reminderNotes, setReminderNotes] = useState("");
+
   const [symptoms, setSymptoms] = useState("");
   const [recording, setRecording] = useState(false);
 
@@ -355,6 +203,38 @@ export default function App() {
 
   const messages = activeChat?.messages || [];
 
+  const getInitials = (name) => {
+    if (!name) return "U";
+
+    const parts = name.trim().split(/\s+/);
+
+    if (parts.length >= 2) {
+      return (
+        parts[0][0] + parts[parts.length - 1][0]
+      ).toUpperCase();
+    }
+
+    return parts[0].slice(0, 2).toUpperCase();
+  };
+
+  // Firebase authentication listener.
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(
+      auth,
+      (firebaseUser) => {
+        setUser(firebaseUser);
+        setAuthLoading(false);
+      },
+      () => {
+        setUser(null);
+        setAuthLoading(false);
+      }
+    );
+
+    return unsubscribe;
+  }, []);
+
+  // Save conversation history in browser storage.
   useEffect(() => {
     try {
       localStorage.setItem(
@@ -368,28 +248,152 @@ export default function App() {
     }
   }, [conversations]);
 
+  // Keep the latest message visible.
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({
       behavior: "smooth",
     });
   }, [messages, loading, activeChatId]);
 
+  // Stop the microphone if the component unmounts.
   useEffect(() => {
-    if (!user) return;
-
-    loadAppointments();
-    loadReminders();
-
     return () => {
       streamRef.current?.getTracks().forEach((track) => {
         track.stop();
       });
     };
-    // Load lists when the authenticated user changes.
+  }, []);
+
+  // Load appointments and medicine reminders after login.
+  useEffect(() => {
+    if (!user) {
+      setAppointments([]);
+      setReminders([]);
+      return;
+    }
+
+    loadAppointments();
+    loadReminders();
+
+    // These functions use the backend API.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
-  function addMessage(role, content, chatId = activeChatId) {
+  // Load saved medical reports when Health Timeline opens.
+  async function loadMedicalReports() {
+    setReportsLoading(true);
+    setReportsError("");
+
+    try {
+      const data = await apiRequest("/medical-reports");
+
+      setMedicalReports(
+        Array.isArray(data)
+          ? data
+          : Array.isArray(data.reports)
+            ? data.reports
+            : []
+      );
+    } catch (err) {
+      setReportsError(err.message);
+    } finally {
+      setReportsLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    if (user && activePage === "timeline") {
+      loadMedicalReports();
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activePage, user]);
+
+  // Check upcoming appointments in one place to avoid
+  // duplicate browser notifications.
+  useEffect(() => {
+    if (!user) return;
+
+    let active = true;
+
+    async function checkAppointments() {
+      try {
+        const data = await apiRequest("/appointments");
+
+        const list = Array.isArray(data)
+          ? data
+          : Array.isArray(data.appointments)
+            ? data.appointments
+            : [];
+
+        const now = Date.now();
+
+        for (const appointment of list) {
+          if (
+            !appointment.appointment_date ||
+            appointment.id == null
+          ) {
+            continue;
+          }
+
+          const appointmentTime = new Date(
+            appointment.appointment_date
+          ).getTime();
+
+          if (!Number.isFinite(appointmentTime)) continue;
+
+          const minutesLeft = (appointmentTime - now) / 60000;
+
+          // Notify between 0 and 10 minutes before the appointment.
+          if (minutesLeft < 0 || minutesLeft > 10) continue;
+
+          const key = `appointment-alert-${appointment.id}`;
+
+          if (sessionStorage.getItem(key)) continue;
+
+          const text =
+            `Your appointment with ${appointment.doctor || "your doctor"
+            } is in ${Math.ceil(minutesLeft)} minute(s).`;
+
+          if (active) {
+            setAppointmentAlert(text);
+          }
+
+          if (
+            "Notification" in window &&
+            Notification.permission === "granted"
+          ) {
+            new Notification("Health Copilot Reminder", {
+              body: text,
+            });
+          }
+
+          sessionStorage.setItem(key, "shown");
+          break;
+        }
+      } catch (err) {
+        console.error("Appointment reminder error:", err);
+      }
+    }
+
+    checkAppointments();
+
+    const timer = window.setInterval(
+      checkAppointments,
+      30000
+    );
+
+    return () => {
+      active = false;
+      window.clearInterval(timer);
+    };
+  }, [user]);
+
+  function addMessage(
+    role,
+    content,
+    chatId = activeChatId
+  ) {
     setConversations((previous) =>
       previous.map((chat) => {
         if (chat.id !== chatId) return chat;
@@ -406,7 +410,10 @@ export default function App() {
         return {
           ...chat,
           title,
-          messages: [...chat.messages, { role, content }],
+          messages: [
+            ...chat.messages,
+            { role, content },
+          ],
           updatedAt: Date.now(),
         };
       })
@@ -416,7 +423,11 @@ export default function App() {
   function startNewChat() {
     const chat = createConversation();
 
-    setConversations((previous) => [chat, ...previous]);
+    setConversations((previous) => [
+      chat,
+      ...previous,
+    ]);
+
     setActiveChatId(chat.id);
     setActivePage("chat");
     setMessage("");
@@ -449,6 +460,7 @@ export default function App() {
 
     if (remaining.length === 0) {
       const newChat = createConversation();
+
       setConversations([newChat]);
       setActiveChatId(newChat.id);
     } else {
@@ -551,9 +563,14 @@ export default function App() {
         }),
       });
 
-      addMessage("assistant", getAnswer(data), chatId);
+      addMessage(
+        "assistant",
+        getAnswer(data),
+        chatId
+      );
     } catch (err) {
       setError(err.message);
+
       addMessage(
         "assistant",
         "I couldn't generate a response. Please check the error message above and try again.",
@@ -600,13 +617,23 @@ export default function App() {
         body: formData,
       });
 
-      addMessage("assistant", getAnswer(data), chatId);
+      addMessage(
+        "assistant",
+        getAnswer(data),
+        chatId
+      );
+
+      // Refresh saved reports if the timeline is currently open.
+      if (isReport && activePage === "timeline") {
+        await loadMedicalReports();
+      }
     } catch (err) {
       setError(err.message);
 
       addMessage(
         "assistant",
-        `I couldn't process this ${isReport ? "medical report" : "image"}. The backend returned an error. Check the error message above and the backend terminal.`,
+        `I couldn't process this ${isReport ? "medical report" : "image"
+        }. Check the error message above and the backend terminal.`,
         chatId
       );
     } finally {
@@ -650,7 +677,12 @@ export default function App() {
         }),
       });
 
-      addMessage("assistant", getAnswer(data), chatId);
+      addMessage(
+        "assistant",
+        getAnswer(data),
+        chatId
+      );
+
       setActivePage("chat");
     } catch (err) {
       setError(err.message);
@@ -697,23 +729,37 @@ export default function App() {
       };
 
       recorder.onerror = () => {
-        setError("An error occurred while recording audio.");
-        stream.getTracks().forEach((track) => track.stop());
+        setError(
+          "An error occurred while recording audio."
+        );
+
+        stream.getTracks().forEach((track) => {
+          track.stop();
+        });
+
         streamRef.current = null;
         setRecording(false);
       };
 
       recorder.onstop = async () => {
-        const blob = new Blob(audioChunksRef.current, {
-          type: recorder.mimeType || "audio/webm",
+        const blob = new Blob(
+          audioChunksRef.current,
+          {
+            type: recorder.mimeType || "audio/webm",
+          }
+        );
+
+        stream.getTracks().forEach((track) => {
+          track.stop();
         });
 
-        stream.getTracks().forEach((track) => track.stop());
         streamRef.current = null;
         setRecording(false);
 
         if (!blob.size) {
-          setError("No audio was recorded. Please try again.");
+          setError(
+            "No audio was recorded. Please try again."
+          );
           return;
         }
 
@@ -742,7 +788,9 @@ export default function App() {
   }
 
   function stopVoiceInput() {
-    if (recorderRef.current?.state === "recording") {
+    if (
+      recorderRef.current?.state === "recording"
+    ) {
       recorderRef.current.stop();
     }
 
@@ -756,7 +804,12 @@ export default function App() {
 
     setError("");
     setLoading(true);
-    addMessage("user", "Voice message submitted", chatId);
+
+    addMessage(
+      "user",
+      "Voice message submitted",
+      chatId
+    );
 
     try {
       const formData = new FormData();
@@ -780,7 +833,11 @@ export default function App() {
         );
       }
 
-      addMessage("assistant", getAnswer(data), chatId);
+      addMessage(
+        "assistant",
+        getAnswer(data),
+        chatId
+      );
     } catch (err) {
       setError(err.message);
 
@@ -821,25 +878,19 @@ export default function App() {
     }
   }
 
-
   async function deleteAppointment(id) {
     setError("");
 
     try {
-      const result = await apiRequest(`/appointments/${id}`, {
+      await apiRequest(`/appointments/${id}`, {
         method: "DELETE",
       });
 
-      console.log("Delete response:", result);
-
       await loadAppointments();
-      setError("Appointment deleted successfully.");
     } catch (err) {
-      console.error("Delete appointment failed:", err);
       setError(`Delete failed: ${err.message}`);
     }
   }
-
 
   async function addReminder(event) {
     event.preventDefault();
@@ -882,6 +933,49 @@ export default function App() {
     }
   }
 
+  async function viewMedicalReport(report) {
+    setReportsError("");
+
+    try {
+      const details = await apiRequest(
+        `/medical-reports/${report.id}`
+      );
+
+      setSelectedReport(details);
+    } catch (err) {
+      setReportsError(err.message);
+    }
+  }
+
+  async function deleteMedicalReport(report) {
+    const confirmed = window.confirm(
+      "Delete this saved medical report?"
+    );
+
+    if (!confirmed) return;
+
+    setReportsError("");
+
+    try {
+      await apiRequest(
+        `/medical-reports/${report.id}`,
+        { method: "DELETE" }
+      );
+
+      setMedicalReports((previous) =>
+        previous.filter(
+          (item) => item.id !== report.id
+        )
+      );
+
+      setSelectedReport((previous) =>
+        previous?.id === report.id ? null : previous
+      );
+    } catch (err) {
+      setReportsError(err.message);
+    }
+  }
+
   async function handleSignOut() {
     setError("");
     setIsSigningOut(true);
@@ -890,21 +984,32 @@ export default function App() {
       await signOut(auth);
       setShowSignOutModal(false);
     } catch {
-      setError("Unable to sign out. Please try again.");
+      setError(
+        "Unable to sign out. Please try again."
+      );
     } finally {
       setIsSigningOut(false);
     }
   }
 
   useEffect(() => {
-    function handleKeyDown(e) {
-      if (e.key === "Escape") {
+    function handleKeyDown(event) {
+      if (event.key === "Escape") {
         setShowSignOutModal(false);
       }
     }
+
     if (showSignOutModal) {
-      window.addEventListener("keydown", handleKeyDown);
-      return () => window.removeEventListener("keydown", handleKeyDown);
+      window.addEventListener(
+        "keydown",
+        handleKeyDown
+      );
+
+      return () =>
+        window.removeEventListener(
+          "keydown",
+          handleKeyDown
+        );
     }
   }, [showSignOutModal]);
 
@@ -929,13 +1034,22 @@ export default function App() {
       subtitle:
         "Keep a record of your medicine schedules.",
     },
+    timeline: {
+      title: "Health Timeline",
+      subtitle:
+        "View your saved medical reports and health history.",
+    },
   };
 
   const currentPage =
     pageDetails[activePage] || pageDetails.chat;
 
   if (authLoading) {
-    return <div className="auth-loading">Checking login...</div>;
+    return (
+      <div className="auth-loading">
+        Checking login...
+      </div>
+    );
   }
 
   if (!user) {
@@ -956,7 +1070,9 @@ export default function App() {
           </div>
         </div>
 
-        <div className="sidebar-label">WORKSPACE</div>
+        <div className="sidebar-label">
+          WORKSPACE
+        </div>
 
         <nav className="sidebar-nav">
           <button
@@ -964,7 +1080,7 @@ export default function App() {
               }`}
             onClick={() => setActivePage("chat")}
           >
-            <Bot size={20} />
+            <HeartPulse size={20} />
             Health Chat
           </button>
 
@@ -978,9 +1094,13 @@ export default function App() {
           </button>
 
           <button
-            className={`nav-item ${activePage === "appointments" ? "active" : ""
+            className={`nav-item ${activePage === "appointments"
+              ? "active"
+              : ""
               }`}
-            onClick={() => setActivePage("appointments")}
+            onClick={() =>
+              setActivePage("appointments")
+            }
           >
             <CalendarDays size={20} />
             Appointments
@@ -993,6 +1113,15 @@ export default function App() {
           >
             <Activity size={20} />
             Medicine Reminders
+          </button>
+
+          <button
+            className={`nav-item ${activePage === "timeline" ? "active" : ""
+              }`}
+            onClick={() => setActivePage("timeline")}
+          >
+            <CalendarDays size={20} />
+            Health Timeline
           </button>
         </nav>
 
@@ -1015,9 +1144,9 @@ export default function App() {
             <div
               key={chat.id}
               className={`history-item ${activeChatId === chat.id &&
-                  activePage === "chat"
-                  ? "selected"
-                  : ""
+                activePage === "chat"
+                ? "selected"
+                : ""
                 }`}
             >
               <button
@@ -1058,9 +1187,11 @@ export default function App() {
               <ShieldCheck size={18} />
               <strong>Your health matters</strong>
             </div>
+
             <p>
-              Use this assistant for general information, not as a
-              substitute for professional medical care.
+              Use this assistant for general
+              information, not as a substitute for
+              professional medical care.
             </p>
           </div>
 
@@ -1085,7 +1216,11 @@ export default function App() {
                   )}
                 </div>
               )}
-              <span className="profile-status-indicator" title="Online" />
+
+              <span
+                className="profile-status-indicator"
+                title="Online"
+              />
             </div>
 
             <div className="profile-details">
@@ -1103,10 +1238,17 @@ export default function App() {
                     "User"}
                 </span>
               </div>
+
               <div className="profile-meta-row">
-                <span className="profile-badge">Free</span>
+                <span className="profile-badge">
+                  Free
+                </span>
+
                 {user.email && (
-                  <span className="profile-email" title={user.email}>
+                  <span
+                    className="profile-email"
+                    title={user.email}
+                  >
                     {user.email}
                   </span>
                 )}
@@ -1116,7 +1258,9 @@ export default function App() {
             <button
               type="button"
               className="profile-logout-btn"
-              onClick={() => setShowSignOutModal(true)}
+              onClick={() =>
+                setShowSignOutModal(true)
+              }
               title="Sign out"
               aria-label="Sign out"
             >
@@ -1186,11 +1330,13 @@ export default function App() {
         )}
 
         {appointmentAlert && (
-          <div role="alert" className="appointment-alert">
+          <div
+            role="alert"
+            className="appointment-alert"
+          >
             🔔 {appointmentAlert}
           </div>
         )}
-
 
         {activePage === "chat" && (
           <section className="chat-panel">
@@ -1198,8 +1344,8 @@ export default function App() {
               {messages.map((item, index) => (
                 <div
                   className={`message-row ${item.role === "user"
-                      ? "user-message"
-                      : "assistant-message"
+                    ? "user-message"
+                    : "assistant-message"
                     }`}
                   key={`${activeChatId}-${index}`}
                 >
@@ -1207,14 +1353,15 @@ export default function App() {
                     {item.role === "user" ? (
                       <User size={20} />
                     ) : (
-                      <Bot size={20} />
+                      <HeartPulse size={20} />
                     )}
                   </div>
 
-
                   <div className="message-content">
                     <strong>
-                      {item.role === "user" ? "You" : "Health Copilot"}
+                      {item.role === "user"
+                        ? "You"
+                        : "Health Copilot"}
                     </strong>
 
                     <div
@@ -1225,15 +1372,17 @@ export default function App() {
                       }
                     >
                       {item.role === "assistant" ? (
-                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                          {item.content.replace(/\\[ \t]*\n/g, "\n").trim()}
+                        <ReactMarkdown
+                          remarkPlugins={[remarkGfm]}
+                        >
+                          {item.content
+                            .replace(/\\[ \t]*\n/g, "\n")
+                            .trim()}
                         </ReactMarkdown>
                       ) : (
                         item.content
                       )}
                     </div>
-
-
                   </div>
                 </div>
               ))}
@@ -1241,7 +1390,7 @@ export default function App() {
               {loading && (
                 <div className="message-row assistant-message">
                   <div className="message-avatar">
-                    <Bot size={20} />
+                    <HeartPulse size={20} />
                   </div>
 
                   <div className="message-content">
@@ -1361,7 +1510,9 @@ export default function App() {
                 <button
                   type="submit"
                   className="send-button"
-                  disabled={!message.trim() || loading}
+                  disabled={
+                    !message.trim() || loading
+                  }
                   aria-label="Send message"
                 >
                   <Send size={21} />
@@ -1369,9 +1520,10 @@ export default function App() {
               </form>
 
               <p className="chat-disclaimer">
-                For general information only. Seek professional
-                medical advice when needed. For emergencies,
-                contact local emergency services.
+                For general information only. Seek
+                professional medical advice when needed.
+                For emergencies, contact local emergency
+                services.
               </p>
             </div>
           </section>
@@ -1385,8 +1537,9 @@ export default function App() {
             </div>
 
             <p>
-              Tell Health Copilot what you are experiencing,
-              when it started, and how severe it feels.
+              Tell Health Copilot what you are
+              experiencing, when it started, and how
+              severe it feels.
             </p>
 
             <form
@@ -1411,15 +1564,17 @@ export default function App() {
               <button
                 type="submit"
                 className="primary-button"
-                disabled={loading || !symptoms.trim()}
+                disabled={
+                  loading || !symptoms.trim()
+                }
               >
                 Check symptoms
               </button>
             </form>
 
             <p className="muted-text">
-              This tool provides general information, not a
-              medical diagnosis.
+              This tool provides general information,
+              not a medical diagnosis.
             </p>
           </section>
         )}
@@ -1513,7 +1668,9 @@ export default function App() {
                           ""}
                       </p>
 
-                      {item.notes && <p>{item.notes}</p>}
+                      {item.notes && (
+                        <p>{item.notes}</p>
+                      )}
                     </div>
 
                     {item.id != null && (
@@ -1538,15 +1695,9 @@ export default function App() {
         {activePage === "reminders" && (
           <section className="content-panel">
             <div className="section-heading">
-              <Activity size={24} />
-              <h2>Medicine reminders</h2>
+              <Clock size={24} />
+              <h2>Medicine Reminders</h2>
             </div>
-
-            <p>
-              Save medicine names and schedules for reference.
-              This version stores reminders but does not send
-              automatic notifications.
-            </p>
 
             <form
               onSubmit={addReminder}
@@ -1562,7 +1713,7 @@ export default function App() {
                 onChange={(event) =>
                   setMedicine(event.target.value)
                 }
-                placeholder="Enter the medicine name"
+                placeholder="Enter medicine name"
                 required
               />
 
@@ -1576,7 +1727,7 @@ export default function App() {
                 onChange={(event) =>
                   setSchedule(event.target.value)
                 }
-                placeholder="As directed by your healthcare professional"
+                placeholder="For example: 8:00 AM after breakfast"
                 required
               />
 
@@ -1590,7 +1741,7 @@ export default function App() {
                 onChange={(event) =>
                   setReminderNotes(event.target.value)
                 }
-                placeholder="Additional notes"
+                placeholder="Additional instructions"
                 rows={3}
               />
 
@@ -1608,7 +1759,7 @@ export default function App() {
 
             {reminders.length === 0 ? (
               <p className="muted-text">
-                No reminders saved yet.
+                No medicine reminders saved yet.
               </p>
             ) : (
               <div className="saved-list">
@@ -1624,7 +1775,9 @@ export default function App() {
 
                       <p>{item.schedule || ""}</p>
 
-                      {item.notes && <p>{item.notes}</p>}
+                      {item.notes && (
+                        <p>{item.notes}</p>
+                      )}
                     </div>
 
                     {item.id != null && (
@@ -1634,7 +1787,7 @@ export default function App() {
                         onClick={() =>
                           deleteReminder(item.id)
                         }
-                        aria-label="Delete reminder"
+                        aria-label="Delete medicine reminder"
                       >
                         <Trash2 size={18} />
                       </button>
@@ -1645,24 +1798,202 @@ export default function App() {
             )}
           </section>
         )}
+
+
+        {/* HEALTH TIMELINE */}
+        {activePage === "timeline" && (
+          <section className="health-timeline">
+            <div className="timeline-header">
+              <div className="timeline-title">
+                <Clock size={28} strokeWidth={2} />
+                <h2>Health Timeline</h2>
+              </div>
+
+              <button
+                type="button"
+                className="timeline-refresh"
+                onClick={loadMedicalReports}
+                disabled={reportsLoading}
+              >
+                {reportsLoading ? "Refreshing..." : "Refresh"}
+              </button>
+            </div>
+
+            <p className="timeline-description">
+              Your previously uploaded medical reports and AI-generated
+              explanations appear here, newest first.
+            </p>
+
+            {reportsLoading && (
+              <div className="timeline-status">
+                Loading your medical reports...
+              </div>
+            )}
+
+            {reportsError && (
+              <div className="timeline-error">
+                {reportsError}
+              </div>
+            )}
+
+            {!reportsLoading &&
+              !reportsError &&
+              medicalReports.length === 0 && (
+                <div className="timeline-empty">
+                  <FileText size={42} />
+                  <h3>No medical reports yet</h3>
+                  <p>
+                    Upload a medical report to start building your health
+                    timeline.
+                  </p>
+                </div>
+              )}
+
+            <div className="timeline-list">
+              {medicalReports.map((report) => (
+                <article className="timeline-card" key={report.id}>
+                  <div className="timeline-card-icon">
+                    <FileText size={23} />
+                  </div>
+
+                  <div className="timeline-card-content">
+                    <h3>{report.filename || report.file_name || "Medical report"}</h3>
+
+                    <span className="timeline-document-type">
+                      {report.document_type || "Medical report"}
+                    </span>
+
+                    <p className="timeline-upload-date">
+                      Uploaded:{" "}
+                      {report.uploaded_at
+                        ? new Date(
+                          report.uploaded_at
+                        ).toLocaleString()
+                        : "Date unavailable"}
+                    </p>
+
+                    <div className="timeline-actions">
+                      <button
+                        type="button"
+                        className="timeline-view-button"
+                        onClick={async () => {
+                          try {
+                            const response = await fetch(
+                              `${API_BASE}/medical-reports/${report.id}`
+                            );
+
+                            if (!response.ok) {
+                              throw new Error("Unable to load this report.");
+                            }
+
+                            const data = await response.json();
+                            setSelectedReport(data);
+                          } catch (error) {
+                            setReportsError(error.message);
+                          }
+                        }}
+                      >
+                        <Eye size={17} />
+                        View report
+                      </button>
+
+                      <button
+                        type="button"
+                        className="timeline-delete-button"
+                        onClick={async () => {
+                          if (
+                            !window.confirm(
+                              "Are you sure you want to delete this report?"
+                            )
+                          ) {
+                            return;
+                          }
+
+                          try {
+                            const response = await fetch(
+                              `${API_BASE}/medical-reports/${report.id}`,
+                              { method: "DELETE" }
+                            );
+
+                            if (!response.ok) {
+                              throw new Error("Unable to delete this report.");
+                            }
+
+                            setMedicalReports((previous) =>
+                              previous.filter((item) => item.id !== report.id)
+                            );
+
+                            if (selectedReport?.id === report.id) {
+                              setSelectedReport(null);
+                            }
+                          } catch (error) {
+                            setReportsError(error.message);
+                          }
+                        }}
+                      >
+                        <Trash2 size={17} />
+                        Delete
+                      </button>
+                    </div>
+
+                    {selectedReport?.id === report.id && (
+                      <div className="timeline-report-details">
+                        <div className="timeline-details-heading">
+                          <h4>Report details</h4>
+
+                          <button
+                            type="button"
+                            className="timeline-close-button"
+                            onClick={() => setSelectedReport(null)}
+                          >
+                            Close details
+                          </button>
+                        </div>
+
+                        <h4>AI-generated summary</h4>
+                        <div className="timeline-summary">
+                          {selectedReport.summary ||
+                            "No summary is available for this report."}
+                        </div>
+
+                        <h4>Extracted report text</h4>
+                        <pre className="timeline-extracted-text">
+                          {selectedReport.extracted_text ||
+                            "No extracted text is available."}
+                        </pre>
+                      </div>
+                    )}
+                  </div>
+                </article>
+              ))}
+            </div>
+          </section>
+        )}
       </main>
 
       {showSignOutModal && (
         <div
           className="signout-modal-backdrop"
-          onClick={() => !isSigningOut && setShowSignOutModal(false)}
+          onClick={() =>
+            !isSigningOut &&
+            setShowSignOutModal(false)
+          }
           role="dialog"
           aria-modal="true"
           aria-labelledby="signout-dialog-title"
         >
           <div
             className="signout-modal-card"
-            onClick={(e) => e.stopPropagation()}
+            onClick={(event) =>
+              event.stopPropagation()
+            }
           >
             <button
               type="button"
               className="signout-modal-close"
-              onClick={() => setShowSignOutModal(false)}
+              onClick={() =>
+                setShowSignOutModal(false)
+              }
               disabled={isSigningOut}
               aria-label="Close dialog"
             >
@@ -1673,7 +2004,10 @@ export default function App() {
               <LogOut size={26} />
             </div>
 
-            <h3 id="signout-dialog-title">Sign out of Health Copilot?</h3>
+            <h3 id="signout-dialog-title">
+              Sign out of Health Copilot?
+            </h3>
+
             <p>
               Are you sure you want to sign out,{" "}
               <strong>
@@ -1681,14 +2015,17 @@ export default function App() {
                   user.email?.split("@")[0] ||
                   "User"}
               </strong>
-              ? Your conversations and reminders will stay safely saved in your account.
+              ? Your conversations saved in this browser
+              will remain there.
             </p>
 
             <div className="signout-modal-actions">
               <button
                 type="button"
                 className="signout-btn-secondary"
-                onClick={() => setShowSignOutModal(false)}
+                onClick={() =>
+                  setShowSignOutModal(false)
+                }
                 disabled={isSigningOut}
               >
                 Cancel

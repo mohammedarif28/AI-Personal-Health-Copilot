@@ -45,6 +45,17 @@ def initialize_database():
             )
         """)
 
+        db.execute("""
+            CREATE TABLE IF NOT EXISTS medical_reports (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                filename TEXT NOT NULL,
+                document_type TEXT NOT NULL,
+                uploaded_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                extracted_text TEXT NOT NULL DEFAULT '',
+                summary TEXT NOT NULL DEFAULT ''
+            )
+        """)
+
 
 def list_appointments():
     with get_db() as db:
@@ -109,5 +120,70 @@ def delete_reminder(reminder_id):
         cursor = db.execute(
             "DELETE FROM reminders WHERE id = ?",
             (reminder_id,)
+        )
+        return cursor.rowcount > 0
+def save_medical_report(
+    filename,
+    document_type,
+    extracted_text,
+    summary,
+):
+    with get_db() as db:
+        cursor = db.execute(
+            """
+            INSERT INTO medical_reports (
+                filename,
+                document_type,
+                extracted_text,
+                summary
+            )
+            VALUES (?, ?, ?, ?)
+            """,
+            (
+                filename,
+                document_type,
+                extracted_text,
+                summary,
+            ),
+        )
+        return cursor.lastrowid
+
+
+def list_medical_reports():
+    with get_db() as db:
+        rows = db.execute(
+            """
+            SELECT
+                id,
+                filename,
+                document_type,
+                uploaded_at
+            FROM medical_reports
+            ORDER BY uploaded_at DESC, id DESC
+            """
+        ).fetchall()
+
+        return [dict(row) for row in rows]
+
+
+def get_medical_report(report_id):
+    with get_db() as db:
+        row = db.execute(
+            """
+            SELECT *
+            FROM medical_reports
+            WHERE id = ?
+            """,
+            (report_id,),
+        ).fetchone()
+
+        return dict(row) if row else None
+
+
+def delete_medical_report(report_id):
+    with get_db() as db:
+        cursor = db.execute(
+            "DELETE FROM medical_reports WHERE id = ?",
+            (report_id,),
         )
         return cursor.rowcount > 0

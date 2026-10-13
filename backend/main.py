@@ -1,7 +1,6 @@
-
 import os
 from datetime import datetime
-from typing import Literal
+
 from dotenv import load_dotenv
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
@@ -15,6 +14,10 @@ from database import (
     list_reminders,
     add_reminder,
     delete_reminder,
+    save_medical_report,
+    list_medical_reports,
+    get_medical_report,
+    delete_medical_report,
 )
 from file_utils import extract_report_text, image_to_data_url
 from health_agent import (
@@ -22,10 +25,13 @@ from health_agent import (
     analyze_health_image,
     transcribe_audio,
 )
-from fastapi.middleware.cors import CORSMiddleware
 from reminder_manager import router as reminder_router
 
 load_dotenv()
+
+# --------------------------------------------------
+# FastAPI Application
+# --------------------------------------------------
 
 app = FastAPI(
     title="AI Personal Health Copilot",
@@ -36,41 +42,41 @@ app = FastAPI(
     ),
     version="1.0.0",
 )
+
+# --------------------------------------------------
+# CORS Configuration
+# Supports the React development server on ports 5173/5174
+# --------------------------------------------------
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:5173",
+        "http://localhost:5174",
         "http://127.0.0.1:5173",
+        "http://127.0.0.1:5174",
     ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Register reminder router
 app.include_router(reminder_router)
 
 
-
-frontend_origin = os.getenv(
-    "FRONTEND_ORIGIN",
-    "http://localhost:5173",
-)
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[
-        frontend_origin,
-        "http://127.0.0.1:5173",
-    ],
-    allow_credentials=False,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
+# --------------------------------------------------
+# Startup
+# --------------------------------------------------
 
 @app.on_event("startup")
 def startup():
     initialize_database()
 
+
+# --------------------------------------------------
+# Request Models
+# --------------------------------------------------
 
 class ChatRequest(BaseModel):
     message: str = Field(min_length=1, max_length=12000)
@@ -90,11 +96,18 @@ class ReminderRequest(BaseModel):
     notes: str = Field(default="", max_length=2000)
 
 
+# --------------------------------------------------
+# Error Handling
+# --------------------------------------------------
+
 def safe_error(exc: Exception):
     message = str(exc)
 
     if isinstance(exc, ValueError):
-        raise HTTPException(status_code=400, detail=message)
+        raise HTTPException(
+            status_code=400,
+            detail=message,
+        )
 
     # Avoid exposing credentials, provider responses, or internal details.
     print(f"Health Copilot error: {type(exc).__name__}: {message}")
@@ -108,6 +121,10 @@ def safe_error(exc: Exception):
     )
 
 
+# --------------------------------------------------
+# Home and Health Endpoints
+# --------------------------------------------------
+
 @app.get("/")
 def home():
     return {
@@ -118,7 +135,10 @@ def home():
 
 @app.get("/health")
 def health():
-    return {"status": "ok", "rag": False}
+    return {
+        "status": "ok",
+        "rag": False,
+    }
 
 
 @app.get("/features")
@@ -137,6 +157,10 @@ def features():
     }
 
 
+# --------------------------------------------------
+# Chat Endpoint
+# --------------------------------------------------
+
 @app.post("/chat")
 def chat(request: ChatRequest):
     try:
@@ -151,9 +175,14 @@ def chat(request: ChatRequest):
             "sources": [],
             "used_rag": False,
         }
+
     except Exception as exc:
         safe_error(exc)
 
+
+# --------------------------------------------------
+# Symptoms Endpoint
+# --------------------------------------------------
 
 @app.post("/symptoms")
 def symptoms(request: ChatRequest):
@@ -172,10 +201,18 @@ def symptoms(request: ChatRequest):
             request.report_context,
         )
 
-        return {"answer": answer, "used_rag": False}
+        return {
+            "answer": answer,
+            "used_rag": False,
+        }
+
     except Exception as exc:
         safe_error(exc)
 
+
+# --------------------------------------------------
+# Upload and Process Medical Report
+# --------------------------------------------------
 
 @app.post("/upload-report")
 async def upload_report(
@@ -186,30 +223,111 @@ async def upload_report(
     language: str = Form(default="Auto-detect"),
 ):
     try:
+        filename = os.path.basename(file.filename or "report")
+
         data = await file.read(10 * 1024 * 1024 + 1)
-        text = extract_report_text(file.filename or "", data)
+
+        if not data or len(data) > 10 * 1024 * 1024:
+            raise HTTPException(
+                status_code=400,
+                detail="The report must be between 1 byte and 10 MB.",
+            )
+
+        extracted_text = extract_report_text(
+            filename,
+            data,
+        )
 
         answer = ask_health_copilot(
             question,
             language,
-            context=text,
+            context=extracted_text,
+        )
+
+        extension = os.path.splitext(filename)[1].lower()
+
+        document_type = {
+            ".pdf": "PDF report",
+            ".txt": "Text report",
+            ".md": "Markdown report",
+        }.get(extension, "Medical report")
+
+        report_id = save_medical_report(
+            filename=filename,
+            document_type=document_type,
+            extracted_text=extracted_text,
+            summary=answer,
         )
 
         return {
-            "filename": file.filename,
-            "extracted_characters": len(text),
-            "extracted_text": text,
+            "id": report_id,
+            "filename": filename,
+            "document_type": document_type,
+            "extracted_characters": len(extracted_text),
+            "extracted_text": extracted_text,
             "answer": answer,
             "used_rag": False,
+            "saved": True,
         }
-    except Exception as exc:
+
+    except HTTPException:
+        raise
+
+    except Exception:
         import traceback
         traceback.print_exc()
+
         raise HTTPException(
             status_code=500,
-            detail=f"Report processing failed: {str(exc)}"
+            detail=(
+                "Report processing or saving failed. "
+                "Check the backend terminal."
+            ),
         )
 
+
+# --------------------------------------------------
+# Medical Reports / Health Timeline
+# --------------------------------------------------
+
+@app.get("/medical-reports")
+def medical_reports():
+    return {
+        "reports": list_medical_reports(),
+    }
+
+
+@app.get("/medical-reports/{report_id}")
+def medical_report_detail(report_id: int):
+    report = get_medical_report(report_id)
+
+    if not report:
+        raise HTTPException(
+            status_code=404,
+            detail="Medical report not found.",
+        )
+
+    return report
+
+
+@app.delete("/medical-reports/{report_id}")
+def remove_medical_report(report_id: int):
+    deleted = delete_medical_report(report_id)
+
+    if not deleted:
+        raise HTTPException(
+            status_code=404,
+            detail="Medical report not found.",
+        )
+
+    return {
+        "message": "Medical report deleted successfully.",
+    }
+
+
+# --------------------------------------------------
+# Medical Image Analysis
+# --------------------------------------------------
 
 @app.post("/analyze-image")
 async def analyze_image(
@@ -221,6 +339,13 @@ async def analyze_image(
 ):
     try:
         data = await file.read(10 * 1024 * 1024 + 1)
+
+        if not data or len(data) > 10 * 1024 * 1024:
+            raise HTTPException(
+                status_code=400,
+                detail="The image must be between 1 byte and 10 MB.",
+            )
+
         image_data_url = image_to_data_url(
             file.filename or "",
             data,
@@ -236,9 +361,17 @@ async def analyze_image(
             "filename": file.filename,
             "answer": answer,
         }
+
+    except HTTPException:
+        raise
+
     except Exception as exc:
         safe_error(exc)
 
+
+# --------------------------------------------------
+# Voice Chat
+# --------------------------------------------------
 
 @app.post("/voice-chat")
 async def voice_chat(
@@ -249,7 +382,16 @@ async def voice_chat(
         filename = (file.filename or "").lower()
 
         if not filename.endswith(
-            (".wav", ".mp3", ".m4a", ".mp4", ".mpeg", ".webm", ".ogg", ".flac")
+            (
+                ".wav",
+                ".mp3",
+                ".m4a",
+                ".mp4",
+                ".mpeg",
+                ".webm",
+                ".ogg",
+                ".flac",
+            )
         ):
             raise ValueError(
                 "Upload a supported audio file such as WAV, MP3, M4A, or WebM."
@@ -258,17 +400,23 @@ async def voice_chat(
         data = await file.read(10 * 1024 * 1024 + 1)
 
         if not data or len(data) > 10 * 1024 * 1024:
-            raise ValueError("Audio must be between 1 byte and 10 MB.")
+            raise ValueError(
+                "Audio must be between 1 byte and 10 MB."
+            )
 
         import io
 
         audio = io.BytesIO(data)
-        audio.name = os.path.basename(file.filename or "audio.wav")
+        audio.name = os.path.basename(
+            file.filename or "audio.wav"
+        )
 
         transcript = transcribe_audio(audio)
 
         if not transcript:
-            raise ValueError("No speech could be recognized.")
+            raise ValueError(
+                "No speech could be recognized."
+            )
 
         answer = ask_health_copilot(
             transcript,
@@ -279,13 +427,20 @@ async def voice_chat(
             "transcript": transcript,
             "answer": answer,
         }
+
     except Exception as exc:
         safe_error(exc)
 
 
+# --------------------------------------------------
+# Appointments
+# --------------------------------------------------
+
 @app.get("/appointments")
 def get_appointments():
-    return {"appointments": list_appointments()}
+    return {
+        "appointments": list_appointments(),
+    }
 
 
 @app.post("/appointments")
@@ -294,6 +449,7 @@ def create_appointment(request: AppointmentRequest):
         datetime.fromisoformat(
             request.appointment_date.replace("Z", "+00:00")
         )
+
     except ValueError:
         raise HTTPException(
             status_code=400,
@@ -323,14 +479,20 @@ def remove_appointment(appointment_id: int):
             detail="Appointment not found.",
         )
 
-    return {"message": "Appointment deleted."}
+    return {
+        "message": "Appointment deleted.",
+    }
 
+
+# --------------------------------------------------
+# Medication Reminders
+# --------------------------------------------------
 
 @app.get("/reminders")
 def get_reminders():
-    return {"reminders": list_reminders()}
-
-
+    return {
+        "reminders": list_reminders(),
+    }
 
 
 @app.post("/reminders")
@@ -338,15 +500,14 @@ def create_reminder(request: ReminderRequest):
     reminder_id = add_reminder(
         request.medicine.strip(),
         request.schedule.strip(),
-        request.notes.strip()
+        request.notes.strip(),
     )
 
     return {
         "id": reminder_id,
-        "message": "Reminder added successfully"
+        "message": "Reminder added successfully.",
     }
 
-    
 
 @app.delete("/reminders/{reminder_id}")
 def remove_reminder(reminder_id: int):
@@ -355,8 +516,9 @@ def remove_reminder(reminder_id: int):
     if not deleted:
         raise HTTPException(
             status_code=404,
-            detail="Reminder not found"
+            detail="Reminder not found.",
         )
 
-    return {"message": "Reminder deleted successfully"}
-
+    return {
+        "message": "Reminder deleted successfully.",
+    }
