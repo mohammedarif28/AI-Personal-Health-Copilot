@@ -529,3 +529,617 @@
     padding: 12px;
   }
 }
+/* Health Copilot: White + Blue + Purple Theme */
+
+body,
+#root {
+  background: #ffffff;
+  color: #111827;
+  min-height: 100%;
+}
+
+.app-shell {
+  background: linear-gradient(
+    135deg,
+    #ffffff 0%,
+    #f5f8ff 55%,
+    #f6f0ff 100%
+  );
+  color: #111827;
+}
+
+.sidebar {
+  background: linear-gradient(
+    180deg,
+    #ffffff 0%,
+    #f5f8ff 65%,
+    #f4edff 100%
+  );
+  border-right: 1px solid #e0e7ff;
+}
+
+.main-content {
+  background: transparent;
+  color: #111827;
+}
+
+.page-header,
+.chat-panel,
+.chat-messages,
+.chat-composer {
+  background-color: #ffffff;
+  color: #111827;
+}
+
+.primary-button,
+.send-button {
+  background: linear-gradient(135deg, #2563eb, #7c3aed);
+  color: #ffffff;
+  border: none;
+}
+
+.primary-button:hover,
+.send-button:hover {
+  filter: brightness(1.08);
+}
+
+.secondary-button {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 1px solid #dbeafe;
+}
+
+.chat-composer {
+  border-top: 1px solid #e0e7ff;
+}
+
+input,
+textarea,
+select {
+  background-color: #ffffff;
+  color: #111827;
+  border-color: #dbe3f0;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+}
+
+button {
+  transition: background-color 0.2s ease, filter 0.2s ease;
+}
+/* ===== FULL HEALTH COPILOT THEME FIX ===== */
+
+html,
+body,
+#root {
+  margin: 0 !important;
+  width: 100% !important;
+  min-height: 100% !important;
+  background: #ffffff !important;
+  color: #111827 !important;
+}
+
+.app-shell {
+  width: 100% !important;
+  min-height: 100vh !important;
+  background: linear-gradient(
+    135deg,
+    #ffffff 0%,
+    #eff6ff 50%,
+    #f3e8ff 100%
+  ) !important;
+  color: #111827 !important;
+}
+
+/* LEFT SIDEBAR */
+.app-shell .sidebar {
+  background: linear-gradient(
+    180deg,
+    #ffffff 0%,
+    #eff6ff 60%,
+    #f3e8ff 100%
+  ) !important;
+  color: #111827 !important;
+  border-right: 1px solid #dbeafe !important;
+}
+
+/* SIDEBAR TEXT */
+.app-shell .sidebar h1,
+.app-shell .sidebar h2,
+.app-shell .sidebar p,
+.app-shell .sidebar span {
+  color: #111827 !important;
+}
+
+/* RIGHT CONTENT */
+.app-shell .main-content {
+  background: transparent !important;
+  color: #111827 !important;
+}
+
+/* CHAT AND OTHER PANELS */
+.app-shell .chat-panel,
+.app-shell .chat-messages,
+.app-shell .chat-composer,
+.app-shell .page-header {
+  color: #111827 !important;
+}
+
+/* INPUTS */
+.app-shell input,
+.app-shell textarea,
+.app-shell select {
+  background: #ffffff !important;
+  color: #111827 !important;
+  border-color: #cbd5e1 !important;
+}
+
+/* BLUE-PURPLE BUTTONS */
+.app-shell .primary-button,
+.app-shell .send-button {
+  background: linear-gradient(
+    135deg,
+    #2563eb,
+    #7c3aed
+  ) !important;
+  color: #ffffff !important;
+  border: none !important;
+}
+
+/* SECONDARY BUTTONS */
+.app-shell .secondary-button {
+  background: #eff6ff !important;
+  color: #1d4ed8 !important;
+  border: 1px solid #bfdbfe !important;
+}
+/* Background only — preserve existing UI styling */
+.app-shell {
+  background:
+    radial-gradient(
+      ellipse at 10% 100%,
+      rgba(91, 33, 182, 0.30),
+      transparent 45%
+    ),
+    radial-gradient(
+      ellipse at 90% 0%,
+      rgba(37, 99, 235, 0.25),
+      transparent 45%
+    ),
+    linear-gradient(
+      135deg,
+      #080b18 0%,
+      #101a36 50%,
+      #1b1033 100%
+    ) !important;
+}
+/* FIX WHITE AREAS — HEALTH COPILOT BACKGROUND ONLY */
+
+/* Header */
+.app-shell .page-header {
+  background: linear-gradient(
+    110deg,
+    #0b1020,
+    #14234a,
+    #251342
+  ) !important;
+  color: #f1f5ff !important;
+}
+
+/* Chat conversation panel */
+.app-shell .chat-panel,
+.app-shell .chat-messages {
+  background: linear-gradient(
+    145deg,
+    #0b1020,
+    #101a36,
+    #1b1235
+  ) !important;
+  color: #f1f5ff !important;
+}
+
+/* Bottom composer area */
+.app-shell .chat-composer {
+  background: linear-gradient(
+    110deg,
+    #0b1020,
+    #142044,
+    #211339
+  ) !important;
+  color: #f1f5ff !important;
+}
+
+/* Message input */
+.app-shell .message-form,
+.app-shell .message-form textarea {
+  background: #10172d !important;
+  color: #f1f5ff !important;
+}
+
+/* Preserve readable text */
+.app-shell .chat-panel h1,
+.app-shell .chat-panel h2,
+.app-shell .chat-panel p,
+.app-shell .chat-panel strong,
+.app-shell .page-header h1,
+.app-shell .page-header p {
+  color: #e6eaff !important;
+}
+
+/* Keep borders subtle */
+.app-shell .chat-composer,
+.app-shell .chat-messages {
+  border-color: #30365e !important;
+}
+
+/* ===== REMOVE WHITE UI ELEMENTS ===== */
+
+/* Sidebar / navbar */
+.app-shell .sidebar,
+.app-shell aside {
+  background: linear-gradient(
+    180deg,
+    #0b1020 0%,
+    #111b3b 55%,
+    #211338 100%
+  ) !important;
+  color: #e8edff !important;
+  border-color: #303565 !important;
+}
+
+/* Chat area */
+.app-shell .chat-panel,
+.app-shell .chat-messages {
+  background: linear-gradient(
+    135deg,
+    #0b1020 0%,
+    #111a35 55%,
+    #201337 100%
+  ) !important;
+  color: #e8edff !important;
+}
+
+/* User message bubble — replace white with dark blue */
+.app-shell .user-message,
+.app-shell .message.user,
+.app-shell [class*="user-message"] {
+  background: #192747 !important;
+  color: #e8edff !important;
+  border-color: #354778 !important;
+}
+
+/* Composer and text area */
+.app-shell .chat-composer,
+.app-shell .message-form,
+.app-shell .message-form textarea,
+.app-shell textarea,
+.app-shell input {
+  background: #10172d !important;
+  color: #f1f5ff !important;
+  border-color: #343e68 !important;
+}
+
+/* Report, Medical Image, Voice Input, New Chat buttons */
+.app-shell .composer-tools button,
+.app-shell .chat-composer button,
+.app-shell .secondary-button {
+  background: linear-gradient(
+    135deg,
+    #17264a,
+    #29204b
+  ) !important;
+  color: #e2e8ff !important;
+  border: 1px solid #424879 !important;
+}
+
+/* Response language dropdown */
+.app-shell .page-header select,
+.app-shell select {
+  background: #151c35 !important;
+  color: #e8edff !important;
+  border-color: #424879 !important;
+}
+
+/* Prevent white backgrounds on common chat elements */
+.app-shell .chat-panel *,
+.app-shell .chat-messages * {
+  scrollbar-color: #5550a4 #11172b;
+}
+
+.app-shell .chat-messages::-webkit-scrollbar-track {
+  background: #11172b !important;
+}
+
+.app-shell .chat-messages::-webkit-scrollbar-thumb {
+  background: #5550a4 !important;
+  border-radius: 8px;
+}
+
+/* Bottom composer */
+.app-shell .chat-composer {
+  background: linear-gradient(
+    110deg,
+    #0b1020,
+    #121b38,
+    #201337
+  ) !important;
+  border-top: 1px solid #303565 !important;
+}
+
+/* ===== CHAT AREA ONLY: BLACK + BLUE + PURPLE ===== */
+
+/* Main conversation box */
+.app-shell .chat-panel {
+  background: linear-gradient(
+    145deg,
+    #0b1226 0%,
+    #111b3a 48%,
+    #211439 100%
+  ) !important;
+  color: #edf2ff !important;
+}
+
+/* Scrolling conversation area */
+.app-shell .chat-messages {
+  background: linear-gradient(
+    145deg,
+    #0b1226 0%,
+    #111b3a 48%,
+    #211439 100%
+  ) !important;
+  color: #edf2ff !important;
+}
+
+/* User message row — remove the blue-gray strip */
+.app-shell .chat-messages .message-row:has(.user-message),
+.app-shell .chat-messages .user-message {
+  background: #1b2345 !important;
+  color: #edf2ff !important;
+  border: 1px solid #424778 !important;
+}
+
+/* User message bubble */
+.app-shell .chat-messages .user-message p,
+.app-shell .chat-messages .user-message div,
+.app-shell .chat-messages [class*="user-message"] {
+  background: #20294d !important;
+  color: #f1f5ff !important;
+  border-color: #454c82 !important;
+}
+
+/* All message text */
+.app-shell .chat-messages p,
+.app-shell .chat-messages li,
+.app-shell .chat-messages td,
+.app-shell .chat-messages th {
+  color: #e5eaff !important;
+}
+
+/* User and assistant names */
+.app-shell .chat-messages strong,
+.app-shell .chat-messages b {
+  color: #c4b5fd !important;
+}
+
+/* Assistant message headings */
+.app-shell .chat-messages h1,
+.app-shell .chat-messages h2,
+.app-shell .chat-messages h3,
+.app-shell .chat-messages h4 {
+  color: #a5c8ff !important;
+}
+
+/* Composer background */
+.app-shell .chat-composer {
+  background: linear-gradient(
+    110deg,
+    #0b1226,
+    #111b3a,
+    #211439
+  ) !important;
+  border-top: 1px solid #343b68 !important;
+}
+
+/* Message input */
+.app-shell .chat-composer textarea {
+  background: #11182f !important;
+  color: #f1f5ff !important;
+  border: 1px solid #3b456f !important;
+}
+
+.app-shell .chat-composer textarea::placeholder {
+  color: #a4aecb !important;
+}
+
+/* Keep the existing toolbar layout, but remove white buttons */
+.app-shell .chat-composer .composer-tools button,
+.app-shell .chat-composer .secondary-button {
+  background: #202044 !important;
+  color: #dbeafe !important;
+  border: 1px solid #454477 !important;
+}
+
+/* Send button */
+.app-shell .chat-composer .send-button {
+  background: linear-gradient(
+    135deg,
+    #3478f6,
+    #8957e5
+  ) !important;
+  color: #ffffff !important;
+}
+
+/* Disclaimer */
+.app-shell .chat-composer .chat-disclaimer {
+  color: #aeb9d8 !important;
+}
+/* ===== USER PROFILE BOX ONLY ===== */
+
+.app-shell .sidebar .profile-card {
+  background: linear-gradient(
+    135deg,
+    #101a35 0%,
+    #19264a 55%,
+    #2a1748 100%
+  ) !important;
+  border: 1px solid #3b4678 !important;
+  color: #f1f5ff !important;
+}
+
+/* Profile name */
+.app-shell .sidebar .profile-card h3,
+.app-shell .sidebar .profile-card h4,
+.app-shell .sidebar .profile-card strong {
+  color: #f1f5ff !important;
+}
+
+/* Profile email and other details */
+.app-shell .sidebar .profile-card p,
+.app-shell .sidebar .profile-card span {
+  color: #c4cde8 !important;
+}
+
+/* User ID / avatar icon container */
+.app-shell .sidebar .profile-card svg,
+.app-shell .sidebar .profile-card .user-icon {
+  color: #a5b4fc !important;
+}
+
+/* Profile action button */
+.app-shell .sidebar .profile-card button {
+  background: linear-gradient(
+    135deg,
+    #1d4ed8,
+    #6d28d9
+  ) !important;
+  color: #ffffff !important;
+  border-color: #5552a0 !important;
+}
+
+/* =========================================
+   FIX SIDEBAR TEXT VISIBILITY
+   Recent Chats + App Branding + Navigation
+========================================= */
+
+/* Health Copilot title and subtitle */
+.sidebar .logo,
+.sidebar .brand,
+.sidebar .brand h1,
+.sidebar .brand h2,
+.sidebar .brand p,
+.sidebar .app-title,
+.sidebar .app-subtitle {
+  color: #ffffff !important;
+}
+
+/* Recent Chats heading */
+.sidebar .recent-chats-title,
+.sidebar .recent-chats-heading,
+.sidebar [class*="recent-chats"] h3,
+.sidebar [class*="recent-chats"] h4 {
+  color: #ffffff !important;
+}
+
+/* Recent chat history text */
+.sidebar .recent-chat,
+.sidebar .recent-chat span,
+.sidebar .recent-chat p,
+.sidebar .chat-item,
+.sidebar .chat-item span,
+.sidebar .chat-item p,
+.sidebar [class*="chat-history"],
+.sidebar [class*="chat-history"] span,
+.sidebar [class*="chat-history"] p,
+.sidebar [class*="recent-chat"],
+.sidebar [class*="recent-chat"] span,
+.sidebar [class*="recent-chat"] p {
+  color: #3897f1 !important;
+}
+
+/* Recent chat icons and action buttons */
+.sidebar [class*="recent-chat"] svg,
+.sidebar [class*="chat-history"] svg,
+.sidebar [class*="chat-item"] svg {
+  color: #085381 !important;
+}
+
+/* Navigation labels */
+.sidebar nav a,
+.sidebar nav button,
+.sidebar nav a span,
+.sidebar nav button span {
+  color: #e2e8f0 !important;
+}
+
+/* Workspace and sidebar section headings */
+.sidebar .section-title,
+.sidebar .sidebar-heading,
+.sidebar [class*="section-heading"] {
+  color: #b0e1cb !important;
+}
+
+/* Recent chat hover */
+.sidebar [class*="recent-chat"]:hover,
+.sidebar [class*="chat-history"]:hover,
+.sidebar [class*="chat-item"]:hover {
+  background-color: #263451 !important;
+}
+
+/* Preserve readable text in the light-green health notice */
+.sidebar .health-notice,
+.sidebar .health-notice p,
+.sidebar .health-notice span,
+.sidebar .health-notice strong {
+  color: #064e3b !important;
+}
+
+/* Preserve selected navigation item's existing appearance */
+.sidebar .nav-item.active,
+.sidebar nav a.active {
+  color: #ff4d35 !important;
+}
+
+/* FIX: NAVBAR OPTIONS MUST REMAIN VISIBLE ON HOVER */
+
+.sidebar nav a,
+.sidebar nav button,
+.sidebar .nav-item,
+.sidebar .nav-item a {
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Hovered option */
+.sidebar nav a:hover,
+.sidebar nav button:hover,
+.sidebar .nav-item:hover,
+.sidebar .nav-item a:hover {
+  background-color: #263451 !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  opacity: 1 !important;
+}
+
+/* Keep nested text visible */
+.sidebar nav a:hover *,
+.sidebar nav button:hover *,
+.sidebar .nav-item:hover *,
+.sidebar .nav-item a:hover * {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Keep icons visible */
+.sidebar nav a:hover svg,
+.sidebar nav button:hover svg,
+.sidebar .nav-item:hover svg {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
