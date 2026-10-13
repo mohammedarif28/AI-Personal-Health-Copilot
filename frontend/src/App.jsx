@@ -28,8 +28,9 @@ import {
 import Login from "./Login";
 import { auth } from "./firebase";
 import { useAppointmentNotifications } from "./useAppointmentNotifications";
-
-const API_BASE = "http://127.0.0.1:8000";
+const API_BASE =
+import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000";
+const API_BASE_URL = "https://ai-personal-health-copilot-ty75.vercel.app";
 const STORAGE_KEY = "health-copilot-conversations-v1";
 
 const createId = () =>
