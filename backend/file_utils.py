@@ -4,9 +4,9 @@ import pytesseract
 import base64
 import io
 from pathlib import Path
+
 import fitz
 from PIL import Image
-from pypdf import PdfReader
 
 if os.name == "nt":
     pytesseract.pytesseract.tesseract_cmd = (
@@ -19,6 +19,7 @@ else:
 
 MAX_FILE_SIZE = 10 * 1024 * 1024
 MAX_REPORT_CHARS = 20000
+
 ALLOWED_REPORT_EXTENSIONS = {".pdf", ".txt", ".md"}
 ALLOWED_IMAGE_EXTENSIONS = {".png", ".jpg", ".jpeg", ".webp"}
 
@@ -40,11 +41,20 @@ def extract_report_text(filename: str, data: bytes) -> str:
             "Upload a PDF, TXT, or Markdown report."
         )
 
+    # Read TXT and Markdown files.
     if extension != ".pdf":
-        text = data.decode("utf-8-sig", errors="replace").strip()
+        text = data.decode(
+            "utf-8-sig",
+            errors="replace",
+        ).strip()
+
         if not text:
             raise ValueError("No readable text was found.")
+
         return text[:MAX_REPORT_CHARS]
+
+    # Extract embedded text from PDF files without Tesseract.
+    document = None
 
     try:
         document = fitz.open(
@@ -53,7 +63,6 @@ def extract_report_text(filename: str, data: bytes) -> str:
         )
 
         if document.needs_pass:
-            document.close()
             raise ValueError(
                 "Password-protected PDFs are not supported."
             )
@@ -63,70 +72,76 @@ def extract_report_text(filename: str, data: bytes) -> str:
         for page_number, page in enumerate(document, start=1):
             text = page.get_text("text").strip()
 
-            # Use OCR if the page has little embedded text.
-            if len(text) < 40:
-                pix = page.get_pixmap(
-                    matrix=fitz.Matrix(2, 2),
-                    alpha=False,
+            if not text:
+                text = (
+                    "[No embedded text found on this page. "
+                    "This page may be scanned and require OCR.]"
                 )
-
-                image = Image.open(
-                    io.BytesIO(pix.tobytes("png"))
-                )
-
-                ocr_text = pytesseract.image_to_string(
-                    image,
-                    config="--oem 3 --psm 3",
-                ).strip()
-
-                # Keep whichever extraction produced more text.
-                if len(ocr_text) > len(text):
-                    text = ocr_text
 
             parts.append(
                 f"--- Page {page_number} ---\n{text}"
             )
 
-        document.close()
         result = "\n\n".join(parts).strip()
 
-        if not result:
+        # Reject PDFs that contain no extractable report text.
+        if not result or all(
+            "[No embedded text found on this page." in part
+            for part in parts
+        ):
             raise ValueError(
-                "No readable text was found in this PDF."
+                "No readable text was found in this PDF. "
+                "It may be a scanned document that requires OCR."
             )
 
         return result[:MAX_REPORT_CHARS]
 
     except ValueError:
         raise
+
     except Exception as exc:
         raise ValueError(
-            "Could not read the PDF. Check that it is valid "
-            "and that Tesseract OCR is installed."
+            "Could not read the PDF. Check that the file is valid."
         ) from exc
+
+    finally:
+        if document is not None:
+            document.close()
+
 
 def image_to_data_url(filename: str, data: bytes) -> str:
     validate_size(data)
     extension = Path(filename).suffix.lower()
 
     if extension not in ALLOWED_IMAGE_EXTENSIONS:
-        raise ValueError("Upload PNG, JPG, JPEG, or WebP images.")
+        raise ValueError(
+            "Upload PNG, JPG, JPEG, or WebP images."
+        )
 
     try:
+        # Verify that the uploaded file is a valid image.
         with Image.open(io.BytesIO(data)) as image:
             image.verify()
 
+        # Reopen the image after verification.
         with Image.open(io.BytesIO(data)) as image:
             image.load()
 
             if image.width * image.height > 20_000_000:
-                raise ValueError("Image dimensions are too large.")
+                raise ValueError(
+                    "Image dimensions are too large."
+                )
 
             image = image.convert("RGB")
             image.thumbnail((1600, 1600))
 
             output = io.BytesIO()
-            image.save(output, format="JPEG", quality=85)
+            image.save(
+                output,
+                format="JPEG",
+                quality=85,
+            )
+
             encoded = base64.b64encode(
                 output.getvalue()
             ).decode("ascii")
@@ -135,5 +150,8 @@ def image_to_data_url(filename: str, data: bytes) -> str:
 
     except ValueError:
         raise
+
     except Exception as exc:
-        raise ValueError("The uploaded image could not be read.") from exc
+        raise ValueError(
+            "The uploaded image could not be read."
+        ) from exc
