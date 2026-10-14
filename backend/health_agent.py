@@ -128,6 +128,7 @@ def ask_health_copilot(
     question: str,
     language: str = "Auto-detect",
     context: str = "",
+    chat_history: list[dict[str, str]] | None = None,
 ) -> str:
     question = question.strip()
 
@@ -165,15 +166,25 @@ def ask_health_copilot(
         response = get_client().chat.completions.create(
             model=GROQ_MODEL,
             messages=[
-                {
-                    "role": "system",
-                    "content": SYSTEM_PROMPT + "\n" + language_instruction,
-                },
-                {
-                    "role": "user",
-                    "content": user_content,
-                },
-            ],
+    {
+        "role": "system",
+        "content": SYSTEM_PROMPT + "\n" + language_instruction,
+    },
+    *[
+        {
+            "role": message["role"],
+            "content": message["content"],
+        }
+        for message in (chat_history or [])
+        if message.get("role") in ("user", "assistant")
+        and isinstance(message.get("content"), str)
+        and message["content"].strip()
+    ],
+    {
+        "role": "user",
+        "content": user_content,
+    },
+],
             temperature=0.2,
             max_completion_tokens=2000,
         )

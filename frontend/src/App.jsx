@@ -28,6 +28,7 @@ import {
 import Login from "./Login";
 import { auth } from "./firebase";
 import { useAppointmentNotifications } from "./useAppointmentNotifications";
+import { useMedicineNotifications } from "./useMedicineNotifications";
 const API_BASE =
 import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000";
 const API_BASE_URL = "https://ai-personal-health-copilot-ty75.vercel.app";
@@ -148,6 +149,10 @@ export default function App() {
     enableNotifications,
   } = useAppointmentNotifications();
 
+  const [reminders, setReminders] = useState([]);
+
+  useMedicineNotifications(reminders);
+
   // Declare activePage before any effect or function uses it.
   const [activePage, setActivePage] = useState("chat");
 
@@ -177,7 +182,6 @@ export default function App() {
   const [uploading, setUploading] = useState(false);
 
   const [appointments, setAppointments] = useState([]);
-  const [reminders, setReminders] = useState([]);
   const [appointmentAlert, setAppointmentAlert] = useState("");
 
   const [doctor, setDoctor] = useState("");
@@ -537,50 +541,64 @@ export default function App() {
     }
   }
 
-  async function sendMessage(event) {
-    event?.preventDefault();
+async function sendMessage(event) {
+  event?.preventDefault();
 
-    const question = message.trim();
+  const question = message.trim();
 
-    if (!question || loading) return;
+  if (!question || loading) return;
 
-    const chatId = activeChatId;
+  const chatId = activeChatId;
 
-    setError("");
-    setMessage("");
-    addMessage("user", question, chatId);
-    setLoading(true);
+  // Collect previous messages before adding the new question.
+  const chatHistory = (activeChat?.messages || [])
+    .filter(
+      (item) =>
+        (item.role === "user" || item.role === "assistant") &&
+        typeof item.content === "string" &&
+        item.content.trim()
+    )
+    .map((item) => ({
+      role: item.role,
+      content: item.content,
+    }));
 
-    try {
-      const data = await apiRequest("/chat", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          message: question,
-          language,
-          report_context: "",
-        }),
-      });
+  setError("");
+  setMessage("");
+  addMessage("user", question, chatId);
+  setLoading(true);
 
-      addMessage(
-        "assistant",
-        getAnswer(data),
-        chatId
-      );
-    } catch (err) {
-      setError(err.message);
+  try {
+    const data = await apiRequest("/chat", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        message: question,
+        language,
+        report_context: "",
+        chat_history: chatHistory,
+      }),
+    });
 
-      addMessage(
-        "assistant",
-        "I couldn't generate a response. Please check the error message above and try again.",
-        chatId
-      );
-    } finally {
-      setLoading(false);
-    }
+    addMessage(
+      "assistant",
+      getAnswer(data),
+      chatId
+    );
+  } catch (err) {
+    setError(err.message);
+
+    addMessage(
+      "assistant",
+      "I couldn't generate a response. Please check the error message above and try again.",
+      chatId
+    );
+  } finally {
+    setLoading(false);
   }
+}
 
   async function uploadFile(file, type) {
     if (!file || loading) return;

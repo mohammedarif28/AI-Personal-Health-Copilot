@@ -80,10 +80,18 @@ def startup():
 # Request Models
 # --------------------------------------------------
 
+
+class ChatMessage(BaseModel):
+    role: str
+    content: str
+
+
 class ChatRequest(BaseModel):
     message: str = Field(min_length=1, max_length=12000)
     language: str = "Auto-detect"
     report_context: str = Field(default="", max_length=20000)
+    chat_history: list[ChatMessage] = Field(default_factory=list)
+
 
 
 class AppointmentRequest(BaseModel):
@@ -166,11 +174,17 @@ def features():
 @app.post("/chat")
 def chat(request: ChatRequest):
     try:
+        
         answer = ask_health_copilot(
             request.message,
             request.language,
             request.report_context,
+            chat_history=[
+                message.model_dump()
+                for message in request.chat_history
+            ],
         )
+
 
         return {
             "answer": answer,
