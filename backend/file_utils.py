@@ -1,9 +1,6 @@
 import os
+import shutil
 import pytesseract
-pytesseract.pytesseract.tesseract_cmd =(
-   
-    r"C:\Program Files\Tesseract-OCR\tesseract.exe"
-)
 import base64
 import io
 from pathlib import Path
@@ -11,6 +8,14 @@ import fitz
 from PIL import Image
 from pypdf import PdfReader
 
+if os.name == "nt":
+    pytesseract.pytesseract.tesseract_cmd = (
+        r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+    )
+else:
+    pytesseract.pytesseract.tesseract_cmd = (
+        shutil.which("tesseract") or "/usr/bin/tesseract"
+    )
 
 MAX_FILE_SIZE = 10 * 1024 * 1024
 MAX_REPORT_CHARS = 20000
