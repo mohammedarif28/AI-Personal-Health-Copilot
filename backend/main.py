@@ -19,11 +19,12 @@ from database import (
     get_medical_report,
     delete_medical_report,
 )
-from file_utils import extract_report_text, image_to_data_url
+from file_utils import extract_report_text, extract_image_text, image_to_data_url
 from health_agent import (
     ask_health_copilot,
     analyze_health_image,
     transcribe_audio,
+    ask_health_copilot_with_attachments,
 )
 from reminder_manager import router as reminder_router
 
@@ -300,6 +301,161 @@ async def upload_report(
                 "Check the backend terminal."
             ),
         )
+
+
+
+@app.post("/chat-with-files")
+async def chat_with_files(
+    files: list[UploadFile] = File(...),
+    question: str = Form(default="Explain these medical files together."),
+    language: str = Form(default="Auto-detect"),
+):
+    import os
+    from pathlib import Path
+
+    from file_utils import (
+        extract_report_text,
+        extract_image_text,
+        image_to_data_url,
+    )
+
+    if not question.strip():
+        raise HTTPException(status_code=400, detail="Enter a question.")
+
+    if len(files) > 10:
+        raise HTTPException(
+            status_code=400,
+            detail="Attach no more than 10 files per message.",
+        )
+
+    report_sections = []
+    image_data_urls = []
+    total_bytes = 0
+    failures = []
+
+    allowed_reports = {".pdf", ".txt", ".md"}
+    allowed_images = {".png", ".jpg", ".jpeg", ".webp"}
+
+    MAX_FILE_SIZE = 10 * 1024 * 1024
+    MAX_TOTAL_UPLOAD_SIZE = 40 * 1024 * 1024
+    MAX_TOTAL_FILE_CHARS = 3000
+
+    for uploaded in files:
+        filename = os.path.basename(
+            uploaded.filename or "attachment"
+        )
+        extension = Path(filename).suffix.lower()
+
+        if extension not in allowed_reports | allowed_images:
+            failures.append(
+                f"{filename}: unsupported file type"
+            )
+            continue
+
+        data = await uploaded.read(MAX_FILE_SIZE + 1)
+        total_bytes += len(data)
+
+        if not data or len(data) > MAX_FILE_SIZE:
+            failures.append(
+                f"{filename}: empty or larger than 10 MB"
+            )
+            continue
+
+        if total_bytes > MAX_TOTAL_UPLOAD_SIZE:
+            raise HTTPException(
+                status_code=413,
+                detail="The combined upload must not exceed 40 MB.",
+            )
+
+        try:
+            if extension in allowed_reports:
+                extracted = extract_report_text(
+                    filename,
+                    data,
+                )
+
+                report_sections.append(
+                    f"===== FILE: {filename} =====\n{extracted}"
+                )
+
+            else:
+                # Keep image analysis and OCR for medical images.
+                image_data_urls.append(
+                    image_to_data_url(filename, data)
+                )
+
+                try:
+                    image_text = extract_image_text(
+                        filename,
+                        data,
+                    )
+
+                    report_sections.append(
+                        f"===== IMAGE FILE: {filename} (OCR TEXT) =====\n"
+                        f"{image_text}"
+                    )
+
+                except ValueError as ocr_error:
+                    # Vision analysis may still work if OCR fails.
+                    report_sections.append(
+                        f"===== IMAGE FILE: {filename} =====\n"
+                        f"OCR unavailable: {ocr_error}. "
+                        "Inspect the image directly."
+                    )
+
+        except ValueError as exc:
+            failures.append(f"{filename}: {exc}")
+
+    if not report_sections:
+        detail = "No attachments could be read."
+
+        if failures:
+            detail += " " + "; ".join(failures)
+
+        raise HTTPException(
+            status_code=400,
+            detail=detail,
+        )
+
+    # Combine all extracted report text.
+    combined_report_context = "\n\n".join(
+        report_sections
+    )
+
+    # Limit the total extracted text sent to the AI.
+    # This does not include image-token usage or the system prompt.
+    if len(combined_report_context) > MAX_TOTAL_FILE_CHARS:
+        combined_report_context = (
+            combined_report_context[:MAX_TOTAL_FILE_CHARS]
+            + "\n\n[Additional extracted text omitted because "
+              "of request limits.]"
+        )
+
+    try:
+        answer = ask_health_copilot_with_attachments(
+            question=question,
+            language=language,
+            report_context=combined_report_context,
+            image_data_urls=image_data_urls,
+        )
+
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=400,
+            detail=str(exc),
+        )
+
+    except Exception as exc:
+        safe_error(exc)
+
+    return {
+        "answer": answer,
+        "files_processed": len(report_sections),
+        "files_skipped": failures,
+        "used_rag": False,
+    }
+
+
 
 
 # --------------------------------------------------

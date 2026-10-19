@@ -17,6 +17,7 @@ import {
   Trash2,
   User,
   Pencil,
+  Menu,
   X,
   MessageSquare,
   LogOut,
@@ -96,7 +97,7 @@ async function apiRequest(path, options = {}) {
     response = await fetch(`${API_BASE}${path}`, options);
   } catch {
     throw new Error(
-      "Cannot connect to the backend. Make sure FastAPI is running at http://127.0.0.1:8000."
+      "Cannot connect to the backend. Check your internet connection and the configured VITE_API_BASE_URL."
     );
   }
 
@@ -160,7 +161,7 @@ export default function App() {
   const [selectedReport, setSelectedReport] = useState(null);
   const [reportsLoading, setReportsLoading] = useState(false);
   const [reportsError, setReportsError] = useState("");
-
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [user, setUser] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [showSignOutModal, setShowSignOutModal] = useState(false);
@@ -180,6 +181,7 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [selectedFiles, setSelectedFiles] = useState([]);
 
   const [appointments, setAppointments] = useState([]);
   const [appointmentAlert, setAppointmentAlert] = useState("");
@@ -196,6 +198,7 @@ export default function App() {
   const [recording, setRecording] = useState(false);
 
   const messagesEndRef = useRef(null);
+  const attachmentInputRef = useRef(null);
   const reportInputRef = useRef(null);
   const imageInputRef = useRef(null);
   const recorderRef = useRef(null);
@@ -435,14 +438,18 @@ export default function App() {
 
     setActiveChatId(chat.id);
     setActivePage("chat");
+    setIsSidebarOpen(false);
     setMessage("");
+    setSelectedFiles([]);
     setError("");
   }
 
   function openChat(chatId) {
     setActiveChatId(chatId);
     setActivePage("chat");
+    setIsSidebarOpen(false);
     setMessage("");
+    setSelectedFiles([]);
     setError("");
   }
 
@@ -541,64 +548,119 @@ export default function App() {
     }
   }
 
-async function sendMessage(event) {
-  event?.preventDefault();
+function addSelectedFiles(fileList) {
+    const incoming = Array.from(fileList || []);
+    const allowed = /\.(pdf|txt|md|png|jpe?g|webp)$/i;
+    const validIncoming = incoming.filter((file) => allowed.test(file.name));
 
-  const question = message.trim();
+    if (validIncoming.length !== incoming.length) {
+      setError("Some files were skipped. Supported types: PDF, TXT, MD, PNG, JPG, JPEG, and WEBP.");
+    } else {
+      setError("");
+    }
 
-  if (!question || loading) return;
+    setSelectedFiles((current) => {
+      const combined = [...current, ...validIncoming];
+      const unique = combined.filter((file, index, all) =>
+        all.findIndex((other) =>
+          other.name === file.name &&
+          other.size === file.size &&
+          other.lastModified === file.lastModified
+        ) === index
+      );
 
-  const chatId = activeChatId;
+      if (unique.length > 10) {
+        setError("A maximum of 10 files can be attached to one message. Extra files were not added.");
+      }
 
-  // Collect previous messages before adding the new question.
-  const chatHistory = (activeChat?.messages || [])
-    .filter(
-      (item) =>
-        (item.role === "user" || item.role === "assistant") &&
-        typeof item.content === "string" &&
-        item.content.trim()
-    )
-    .map((item) => ({
-      role: item.role,
-      content: item.content,
-    }));
-
-  setError("");
-  setMessage("");
-  addMessage("user", question, chatId);
-  setLoading(true);
-
-  try {
-    const data = await apiRequest("/chat", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        message: question,
-        language,
-        report_context: "",
-        chat_history: chatHistory,
-      }),
+      return unique.slice(0, 10);
     });
-
-    addMessage(
-      "assistant",
-      getAnswer(data),
-      chatId
-    );
-  } catch (err) {
-    setError(err.message);
-
-    addMessage(
-      "assistant",
-      "I couldn't generate a response. Please check the error message above and try again.",
-      chatId
-    );
-  } finally {
-    setLoading(false);
   }
-}
+
+  function removeSelectedFile(indexToRemove) {
+    setSelectedFiles((current) => current.filter((_, index) => index !== indexToRemove));
+  }
+
+  async function sendMessage(event) {
+    event?.preventDefault();
+
+    const question = message.trim();
+    const filesToSend = [...selectedFiles];
+
+    if ((!question && filesToSend.length === 0) || loading) return;
+
+    const chatId = activeChatId;
+    const chatHistory = (activeChat?.messages || [])
+      .filter((item) =>
+        (item.role === "user" || item.role === "assistant") &&
+        typeof item.content === "string" && item.content.trim()
+      )
+      .map((item) => ({ role: item.role, content: item.content }));
+
+    const displayText = [
+      question || "Please analyze these attachments.",
+      ...(filesToSend.length
+        ? [`Attachments: ${filesToSend.map((file) => file.name).join(", ")}`]
+        : []),
+    ].join("\n");
+
+    setError("");
+    setMessage("");
+    addMessage("user", displayText, chatId);
+    setLoading(true);
+    setUploading(filesToSend.length > 0);
+
+    try {
+      let data;
+
+      if (filesToSend.length > 0) {
+        const formData = new FormData();
+        formData.append("question", question || "Explain these medical files together.");
+        formData.append("language", language);
+        filesToSend.forEach((file) => formData.append("files", file));
+
+        data = await apiRequest("/chat-with-files", {
+          method: "POST",
+          body: formData,
+        });
+        setSelectedFiles([]);
+
+        if (activePage === "timeline") {
+          await loadMedicalReports();
+        }
+      } else {
+        data = await apiRequest("/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            message: question,
+            language,
+            report_context: "",
+            chat_history: chatHistory,
+          }),
+        });
+      }
+
+      let answer = getAnswer(data);
+      if (Array.isArray(data.files_skipped) && data.files_skipped.length) {
+        answer += "\n\n**Files not processed:**\n" +
+          data.files_skipped.map((item) => `- ${item}`).join("\n");
+      }
+      addMessage("assistant", answer, chatId);
+    } catch (err) {
+      setError(err.message);
+      addMessage(
+        "assistant",
+        "I couldn't process your message. Check the error above and try again. Your selected files have been kept so you can retry.",
+        chatId
+      );
+      setSelectedFiles(filesToSend);
+      setMessage(question);
+    } finally {
+      setLoading(false);
+      setUploading(false);
+    }
+  }
 
   async function uploadFile(file, type) {
     if (!file || loading) return;
@@ -1032,6 +1094,20 @@ async function sendMessage(event) {
     }
   }, [showSignOutModal]);
 
+  // Close the navigation drawer with Escape.
+  useEffect(() => {
+    function handleDrawerKeyDown(event) {
+      if (event.key === "Escape") {
+        setIsSidebarOpen(false);
+      }
+    }
+
+    if (isSidebarOpen) {
+      window.addEventListener("keydown", handleDrawerKeyDown);
+      return () => window.removeEventListener("keydown", handleDrawerKeyDown);
+    }
+  }, [isSidebarOpen]);
+
   const pageDetails = {
     chat: {
       title: "Health Chat",
@@ -1076,8 +1152,27 @@ async function sendMessage(event) {
   }
 
   return (
-    <div className="app-shell">
-      <aside className="sidebar">
+    <div className={`app-shell ${isSidebarOpen ? "sidebar-is-open" : ""}`}>
+      {isSidebarOpen && (
+        <button
+          type="button"
+          className="sidebar-overlay"
+          onClick={() => setIsSidebarOpen(false)}
+          aria-label="Close navigation menu"
+          tabIndex={0}
+        />
+      )}
+
+      <aside className={`sidebar ${isSidebarOpen ? "sidebar-open" : ""}`}>
+        <button
+          type="button"
+          className="sidebar-close-button"
+          onClick={() => setIsSidebarOpen(false)}
+          aria-label="Close navigation menu"
+        >
+          <X size={24} strokeWidth={2.5} />
+
+        </button>
         <div className="brand">
           <div className="brand-icon">
             <Activity size={27} />
@@ -1097,7 +1192,7 @@ async function sendMessage(event) {
           <button
             className={`nav-item ${activePage === "chat" ? "active" : ""
               }`}
-            onClick={() => setActivePage("chat")}
+            onClick={() => { setActivePage("chat"); setIsSidebarOpen(false); }}
           >
             <HeartPulse size={20} />
             Health Chat
@@ -1106,7 +1201,7 @@ async function sendMessage(event) {
           <button
             className={`nav-item ${activePage === "symptoms" ? "active" : ""
               }`}
-            onClick={() => setActivePage("symptoms")}
+            onClick={() => { setActivePage("symptoms"); setIsSidebarOpen(false); }}
           >
             <Stethoscope size={20} />
             Symptoms
@@ -1117,9 +1212,10 @@ async function sendMessage(event) {
               ? "active"
               : ""
               }`}
-            onClick={() =>
-              setActivePage("appointments")
-            }
+            onClick={() => {
+              setActivePage("appointments");
+              setIsSidebarOpen(false);
+            }}
           >
             <CalendarDays size={20} />
             Appointments
@@ -1128,7 +1224,7 @@ async function sendMessage(event) {
           <button
             className={`nav-item ${activePage === "reminders" ? "active" : ""
               }`}
-            onClick={() => setActivePage("reminders")}
+            onClick={() => { setActivePage("reminders"); setIsSidebarOpen(false); }}
           >
             <Activity size={20} />
             Medicine Reminders
@@ -1137,7 +1233,7 @@ async function sendMessage(event) {
           <button
             className={`nav-item ${activePage === "timeline" ? "active" : ""
               }`}
-            onClick={() => setActivePage("timeline")}
+            onClick={() => { setActivePage("timeline"); setIsSidebarOpen(false); }}
           >
             <CalendarDays size={20} />
             Health Timeline
@@ -1291,6 +1387,16 @@ async function sendMessage(event) {
 
       <main className="main-content">
         <header className="page-header">
+          <button
+            type="button"
+            className="menu-toggle"
+            onClick={() => setIsSidebarOpen(true)}
+            aria-label="Open navigation menu"
+            aria-expanded={isSidebarOpen}
+          >
+            <Menu size={24} />
+          </button>
+              
           <div>
             <h1>{currentPage.title}</h1>
             <p>{currentPage.subtitle}</p>
@@ -1383,6 +1489,7 @@ async function sendMessage(event) {
                         : "Health Copilot"}
                     </strong>
 
+
                     <div
                       className={
                         item.role === "assistant"
@@ -1391,9 +1498,7 @@ async function sendMessage(event) {
                       }
                     >
                       {item.role === "assistant" ? (
-                        <ReactMarkdown
-                          remarkPlugins={[remarkGfm]}
-                        >
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
                           {item.content
                             .replace(/\\[ \t]*\n/g, "\n")
                             .trim()}
@@ -1402,6 +1507,7 @@ async function sendMessage(event) {
                         item.content
                       )}
                     </div>
+
                   </div>
                 </div>
               ))}
@@ -1427,25 +1533,11 @@ async function sendMessage(event) {
                 <button
                   type="button"
                   className="tool-button"
-                  onClick={() =>
-                    reportInputRef.current?.click()
-                  }
+                  onClick={() => attachmentInputRef.current?.click()}
                   disabled={loading || uploading}
                 >
-                  <FileText size={18} />
-                  Report
-                </button>
-
-                <button
-                  type="button"
-                  className="tool-button"
-                  onClick={() =>
-                    imageInputRef.current?.click()
-                  }
-                  disabled={loading || uploading}
-                >
-                  <ImageIcon size={18} />
-                  Medical image
+                  <Plus size={18} />
+                  Attach files
                 </button>
 
                 <button
@@ -1477,30 +1569,47 @@ async function sendMessage(event) {
               </div>
 
               <input
-                ref={reportInputRef}
+                ref={attachmentInputRef}
                 type="file"
-                accept=".pdf,.txt,.md"
+                accept=".pdf,.txt,.md,.png,.jpg,.jpeg,.webp"
+                multiple
                 hidden
-                onChange={(event) =>
-                  uploadFile(
-                    event.target.files?.[0],
-                    "report"
-                  )
-                }
+                onChange={(event) => {
+                  addSelectedFiles(event.target.files);
+                  event.target.value = "";
+                }}
               />
 
-              <input
-                ref={imageInputRef}
-                type="file"
-                accept="image/png,image/jpeg,image/webp"
-                hidden
-                onChange={(event) =>
-                  uploadFile(
-                    event.target.files?.[0],
-                    "image"
-                  )
-                }
-              />
+              {selectedFiles.length > 0 && (
+                <div className="selected-attachments" aria-label="Selected attachments">
+                  {selectedFiles.map((file, index) => (
+                    <div
+                      className="selected-attachment"
+                      key={`${file.name}-${file.size}-${file.lastModified}`}
+                    >
+                      {file.type.startsWith("image/") ? (
+                        <ImageIcon size={22} />
+                      ) : (
+                        <FileText size={22} />
+                      )}
+                      <div className="attachment-details">
+                        <span title={file.name}>{file.name}</span>
+                        <small>{(file.size / 1024 / 1024).toFixed(2)} MB</small>
+                      </div>
+                      <button
+                        type="button"
+                        className="remove-attachment"
+                        onClick={() => removeSelectedFile(index)}
+                        disabled={loading}
+                        aria-label={`Remove ${file.name}`}
+                        title={`Remove ${file.name}`}
+                      >
+                        <X size={16} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
 
               <form
                 className="message-form"
@@ -1530,7 +1639,7 @@ async function sendMessage(event) {
                   type="submit"
                   className="send-button"
                   disabled={
-                    !message.trim() || loading
+                    (!message.trim() && selectedFiles.length === 0) || loading
                   }
                   aria-label="Send message"
                 >

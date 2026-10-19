@@ -1,4 +1,3 @@
-
 .appointment-alert {
   margin: 12px 20px;
   padding: 12px 16px;
@@ -117,7 +116,7 @@
   gap: 15px;
 }
 
-.timeline-title > svg {
+.timeline-title>svg {
   color: #11966e;
   flex-shrink: 0;
 }
@@ -199,7 +198,7 @@
   min-width: 0;
 }
 
-.timeline-card-content > h3 {
+.timeline-card-content>h3 {
   margin: 1px 0 10px;
   color: #18385f;
   font-size: 18px;
@@ -392,7 +391,7 @@
     height: 36px;
   }
 
-  .timeline-card-content > h3 {
+  .timeline-card-content>h3 {
     font-size: 15px;
   }
 
@@ -407,7 +406,7 @@
 }
 
 /* Minimize the Enable Notifications button */
-.page-header > .primary-button {
+.page-header>.primary-button {
   width: auto;
   min-width: 0;
   flex: 0 0 auto;
@@ -444,9 +443,9 @@
 }
 
 /* Keep status and alerts from shrinking unpredictably */
-.main-content > .muted-text,
-.main-content > .error-banner,
-.main-content > .appointment-alert {
+.main-content>.muted-text,
+.main-content>.error-banner,
+.main-content>.appointment-alert {
   flex-shrink: 0;
 }
 
@@ -529,6 +528,7 @@
     padding: 12px;
   }
 }
+
 /* Health Copilot: White + Blue + Purple Theme */
 
 body,
@@ -539,22 +539,18 @@ body,
 }
 
 .app-shell {
-  background: linear-gradient(
-    135deg,
-    #ffffff 0%,
-    #f5f8ff 55%,
-    #f6f0ff 100%
-  );
+  background: linear-gradient(135deg,
+      #ffffff 0%,
+      #f5f8ff 55%,
+      #f6f0ff 100%);
   color: #111827;
 }
 
 .sidebar {
-  background: linear-gradient(
-    180deg,
-    #ffffff 0%,
-    #f5f8ff 65%,
-    #f4edff 100%
-  );
+  background: linear-gradient(180deg,
+      #ffffff 0%,
+      #f5f8ff 65%,
+      #f4edff 100%);
   border-right: 1px solid #e0e7ff;
 }
 
@@ -612,6 +608,7 @@ select:focus {
 button {
   transition: background-color 0.2s ease, filter 0.2s ease;
 }
+
 /* ===== FULL HEALTH COPILOT THEME FIX ===== */
 
 html,
@@ -627,23 +624,19 @@ body,
 .app-shell {
   width: 100% !important;
   min-height: 100vh !important;
-  background: linear-gradient(
-    135deg,
-    #ffffff 0%,
-    #eff6ff 50%,
-    #f3e8ff 100%
-  ) !important;
+  background: linear-gradient(135deg,
+      #ffffff 0%,
+      #eff6ff 50%,
+      #f3e8ff 100%) !important;
   color: #111827 !important;
 }
 
 /* LEFT SIDEBAR */
 .app-shell .sidebar {
-  background: linear-gradient(
-    180deg,
-    #ffffff 0%,
-    #eff6ff 60%,
-    #f3e8ff 100%
-  ) !important;
+  background: linear-gradient(180deg,
+      #ffffff 0%,
+      #eff6ff 60%,
+      #f3e8ff 100%) !important;
   color: #111827 !important;
   border-right: 1px solid #dbeafe !important;
 }
@@ -682,11 +675,9 @@ body,
 /* BLUE-PURPLE BUTTONS */
 .app-shell .primary-button,
 .app-shell .send-button {
-  background: linear-gradient(
-    135deg,
-    #2563eb,
-    #7c3aed
-  ) !important;
+  background: linear-gradient(135deg,
+      #2563eb,
+      #7c3aed) !important;
   color: #ffffff !important;
   border: none !important;
 }
@@ -697,59 +688,49 @@ body,
   color: #1d4ed8 !important;
   border: 1px solid #bfdbfe !important;
 }
+
 /* Background only — preserve existing UI styling */
 .app-shell {
   background:
-    radial-gradient(
-      ellipse at 10% 100%,
+    radial-gradient(ellipse at 10% 100%,
       rgba(91, 33, 182, 0.30),
-      transparent 45%
-    ),
-    radial-gradient(
-      ellipse at 90% 0%,
+      transparent 45%),
+    radial-gradient(ellipse at 90% 0%,
       rgba(37, 99, 235, 0.25),
-      transparent 45%
-    ),
-    linear-gradient(
-      135deg,
+      transparent 45%),
+    linear-gradient(135deg,
       #080b18 0%,
       #101a36 50%,
-      #1b1033 100%
-    ) !important;
+      #1b1033 100%) !important;
 }
+
 /* FIX WHITE AREAS — HEALTH COPILOT BACKGROUND ONLY */
 
 /* Header */
 .app-shell .page-header {
-  background: linear-gradient(
-    110deg,
-    #0b1020,
-    #14234a,
-    #251342
-  ) !important;
+  background: linear-gradient(110deg,
+      #0b1020,
+      #14234a,
+      #251342) !important;
   color: #f1f5ff !important;
 }
 
 /* Chat conversation panel */
 .app-shell .chat-panel,
 .app-shell .chat-messages {
-  background: linear-gradient(
-    145deg,
-    #0b1020,
-    #101a36,
-    #1b1235
-  ) !important;
+  background: linear-gradient(145deg,
+      #0b1020,
+      #101a36,
+      #1b1235) !important;
   color: #f1f5ff !important;
 }
 
 /* Bottom composer area */
 .app-shell .chat-composer {
-  background: linear-gradient(
-    110deg,
-    #0b1020,
-    #142044,
-    #211339
-  ) !important;
+  background: linear-gradient(110deg,
+      #0b1020,
+      #142044,
+      #211339) !important;
   color: #f1f5ff !important;
 }
 
@@ -781,12 +762,10 @@ body,
 /* Sidebar / navbar */
 .app-shell .sidebar,
 .app-shell aside {
-  background: linear-gradient(
-    180deg,
-    #0b1020 0%,
-    #111b3b 55%,
-    #211338 100%
-  ) !important;
+  background: linear-gradient(180deg,
+      #0b1020 0%,
+      #111b3b 55%,
+      #211338 100%) !important;
   color: #e8edff !important;
   border-color: #303565 !important;
 }
@@ -794,12 +773,10 @@ body,
 /* Chat area */
 .app-shell .chat-panel,
 .app-shell .chat-messages {
-  background: linear-gradient(
-    135deg,
-    #0b1020 0%,
-    #111a35 55%,
-    #201337 100%
-  ) !important;
+  background: linear-gradient(135deg,
+      #0b1020 0%,
+      #111a35 55%,
+      #201337 100%) !important;
   color: #e8edff !important;
 }
 
@@ -827,11 +804,9 @@ body,
 .app-shell .composer-tools button,
 .app-shell .chat-composer button,
 .app-shell .secondary-button {
-  background: linear-gradient(
-    135deg,
-    #17264a,
-    #29204b
-  ) !important;
+  background: linear-gradient(135deg,
+      #17264a,
+      #29204b) !important;
   color: #e2e8ff !important;
   border: 1px solid #424879 !important;
 }
@@ -861,12 +836,10 @@ body,
 
 /* Bottom composer */
 .app-shell .chat-composer {
-  background: linear-gradient(
-    110deg,
-    #0b1020,
-    #121b38,
-    #201337
-  ) !important;
+  background: linear-gradient(110deg,
+      #0b1020,
+      #121b38,
+      #201337) !important;
   border-top: 1px solid #303565 !important;
 }
 
@@ -874,23 +847,19 @@ body,
 
 /* Main conversation box */
 .app-shell .chat-panel {
-  background: linear-gradient(
-    145deg,
-    #0b1226 0%,
-    #111b3a 48%,
-    #211439 100%
-  ) !important;
+  background: linear-gradient(145deg,
+      #0b1226 0%,
+      #111b3a 48%,
+      #211439 100%) !important;
   color: #edf2ff !important;
 }
 
 /* Scrolling conversation area */
 .app-shell .chat-messages {
-  background: linear-gradient(
-    145deg,
-    #0b1226 0%,
-    #111b3a 48%,
-    #211439 100%
-  ) !important;
+  background: linear-gradient(145deg,
+      #0b1226 0%,
+      #111b3a 48%,
+      #211439 100%) !important;
   color: #edf2ff !important;
 }
 
@@ -935,12 +904,10 @@ body,
 
 /* Composer background */
 .app-shell .chat-composer {
-  background: linear-gradient(
-    110deg,
-    #0b1226,
-    #111b3a,
-    #211439
-  ) !important;
+  background: linear-gradient(110deg,
+      #0b1226,
+      #111b3a,
+      #211439) !important;
   border-top: 1px solid #343b68 !important;
 }
 
@@ -965,11 +932,9 @@ body,
 
 /* Send button */
 .app-shell .chat-composer .send-button {
-  background: linear-gradient(
-    135deg,
-    #3478f6,
-    #8957e5
-  ) !important;
+  background: linear-gradient(135deg,
+      #3478f6,
+      #8957e5) !important;
   color: #ffffff !important;
 }
 
@@ -977,15 +942,14 @@ body,
 .app-shell .chat-composer .chat-disclaimer {
   color: #aeb9d8 !important;
 }
+
 /* ===== USER PROFILE BOX ONLY ===== */
 
 .app-shell .sidebar .profile-card {
-  background: linear-gradient(
-    135deg,
-    #101a35 0%,
-    #19264a 55%,
-    #2a1748 100%
-  ) !important;
+  background: linear-gradient(135deg,
+      #101a35 0%,
+      #19264a 55%,
+      #2a1748 100%) !important;
   border: 1px solid #3b4678 !important;
   color: #f1f5ff !important;
 }
@@ -1011,11 +975,9 @@ body,
 
 /* Profile action button */
 .app-shell .sidebar .profile-card button {
-  background: linear-gradient(
-    135deg,
-    #1d4ed8,
-    #6d28d9
-  ) !important;
+  background: linear-gradient(135deg,
+      #1d4ed8,
+      #6d28d9) !important;
   color: #ffffff !important;
   border-color: #5552a0 !important;
 }
@@ -1142,4 +1104,367 @@ body,
   stroke: #ffffff !important;
   opacity: 1 !important;
   visibility: visible !important;
+}
+
+.selected-attachments {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  max-height: 150px;
+  overflow-y: auto;
+  margin: 0 0 12px;
+}
+
+.selected-attachment {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  max-width: 260px;
+  min-width: 0;
+  padding: 9px 11px;
+  border: 1px solid #dbe3f0;
+  border-radius: 12px;
+  background: #f8faff;
+  color: #334155;
+}
+
+.attachment-details {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 3px;
+}
+
+.attachment-details span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 175px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.attachment-details small {
+  color: #64748b;
+  font-size: 11px;
+}
+
+.remove-attachment {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: #64748b;
+  cursor: pointer;
+  padding: 5px;
+}
+
+.remove-attachment:hover {
+  background: #e2e8f0;
+  color: #b91c1c;
+}
+
+@media (max-width: 600px) {
+  .selected-attachment {
+    max-width: 100%;
+  }
+
+  .attachment-details span {
+    max-width: 150px;
+  }
+}
+
+/* Reduce extra spacing in AI chat responses */
+.app-shell .chat-messages .health-response p {
+  margin-top: 0 !important;
+  margin-bottom: 4px !important;
+  line-height: 1.4 !important;
+}
+
+.app-shell .chat-messages .health-response h1,
+.app-shell .chat-messages .health-response h2,
+.app-shell .chat-messages .health-response h3,
+.app-shell .chat-messages .health-response h4 {
+  margin-top: 8px !important;
+  margin-bottom: 4px !important;
+  line-height: 1.4 !important;
+}
+
+.app-shell .chat-messages .health-response ul,
+.app-shell .chat-messages .health-response ol {
+  margin-top: 2px !important;
+  margin-bottom: 4px !important;
+  padding-left: 20px !important;
+}
+
+.app-shell .chat-messages .health-response li {
+  margin-bottom: 1px !important;
+}
+
+.app-shell .chat-messages .health-response li p {
+  margin-bottom: 0 !important;
+}
+
+/* Reduce excessive spacing in AI responses */
+.app-shell .ai-response-box p {
+  margin-top: 0 !important;
+  margin-bottom: 4px !important;
+  line-height: 1.4 !important;
+}
+
+.app-shell .ai-response-box h1,
+.app-shell .ai-response-box h2,
+.app-shell .ai-response-box h3,
+.app-shell .ai-response-box h4 {
+  margin-top: 8px !important;
+  margin-bottom: 4px !important;
+  line-height: 1.4 !important;
+}
+
+.app-shell .ai-response-box ul,
+.app-shell .ai-response-box ol {
+  margin-top: 2px !important;
+  margin-bottom: 4px !important;
+  padding-left: 22px !important;
+}
+
+.app-shell .ai-response-box li {
+  margin-bottom: 1px !important;
+}
+
+.app-shell .ai-response-box li p {
+  margin-bottom: 0 !important;
+}
+
+.app-shell .ai-response-box> :first-child {
+  margin-top: 0 !important;
+}
+
+.app-shell .ai-response-box> :last-child {
+  margin-bottom: 0 !important;
+}
+
+/* ChatGPT-style AI response formatting */
+.ai-response-box {
+  font-size: 15px;
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+}
+
+.ai-response-box p {
+  margin: 0 0 12px !important;
+  line-height: 1.65 !important;
+}
+
+.ai-response-box h1,
+.ai-response-box h2,
+.ai-response-box h3,
+.ai-response-box h4 {
+  font-weight: 600;
+  line-height: 1.4 !important;
+  margin: 20px 0 8px !important;
+}
+
+.ai-response-box h1:first-child,
+.ai-response-box h2:first-child,
+.ai-response-box h3:first-child,
+.ai-response-box h4:first-child {
+  margin-top: 0 !important;
+}
+
+.ai-response-box ul,
+.ai-response-box ol {
+  margin: 4px 0 14px !important;
+  padding-left: 24px !important;
+}
+
+.ai-response-box li {
+  padding-left: 2px;
+  margin: 4px 0 !important;
+}
+
+.ai-response-box li p {
+  margin: 0 !important;
+}
+
+.ai-response-box strong {
+  font-weight: 650;
+}
+
+.ai-response-box blockquote {
+  margin: 12px 0;
+  padding: 4px 0 4px 14px;
+  border-left: 3px solid var(--border-color, #888);
+  opacity: 0.9;
+}
+
+.ai-response-box pre {
+  padding: 14px;
+  border-radius: 10px;
+  overflow-x: auto;
+  margin: 12px 0;
+}
+
+.ai-response-box code {
+  font-size: 0.9em;
+}
+
+.ai-response-box table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 12px 0;
+  display: block;
+  overflow-x: auto;
+}
+
+.ai-response-box th,
+.ai-response-box td {
+  padding: 8px 12px;
+  border: 1px solid var(--border-color, #888);
+  text-align: left;
+}
+
+.ai-response-box> :first-child {
+  margin-top: 0 !important;
+}
+
+.ai-response-box> :last-child {
+  margin-bottom: 0 !important;
+}
+
+/* Sidebar drawer improvements */
+
+.app-shell {
+  position: relative;
+  min-height: 100vh;
+}
+
+.menu-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 1002;
+}
+
+.sidebar-close-button {
+  display: none;
+}
+
+.sidebar-overlay {
+  display: none;
+}
+
+
+/* Mobile sidebar drawer */
+@media (max-width: 768px) {
+  .app-shell {
+    position: relative;
+  }
+
+  .app-shell .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: min(85vw, 320px);
+    height: 100dvh;
+    overflow-y: auto;
+    box-sizing: border-box;
+    z-index: 1001;
+    transform: translateX(-100%);
+    visibility: hidden;
+    transition: transform 0.25s ease, visibility 0.25s ease;
+  }
+
+  .app-shell .sidebar.sidebar-open {
+    transform: translateX(0);
+    visibility: visible;
+  }
+
+  .app-shell .sidebar-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    border: 0;
+    background: rgba(0, 0, 0, 0.55);
+    z-index: 1000;
+    cursor: pointer;
+  }
+
+  .app-shell .sidebar-close-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 1002;
+    cursor: pointer;
+  }
+
+  .app-shell .main-content {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+/* Desktop sidebar drawer */
+@media (min-width: 769px) {
+  .app-shell .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    height: 100vh;
+    width: 280px;
+    overflow-y: auto;
+    z-index: 1001;
+    transform: translateX(-100%);
+    visibility: hidden;
+    transition: transform 0.25s ease, visibility 0.25s ease;
+  }
+
+  .app-shell .sidebar.sidebar-open {
+    transform: translateX(0);
+    visibility: visible;
+  }
+
+  .app-shell .sidebar-overlay {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+    background: rgba(0, 0, 0, 0.45);
+    z-index: 1000;
+    cursor: pointer;
+  }
+
+  .app-shell.sidebar-is-open .sidebar-overlay {
+    display: block;
+  }
+}
+.app-shell .sidebar .sidebar-close-button {
+  display: flex !important;
+  position: absolute !important;
+  top: 12px !important;
+  right: 12px !important;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  color: #ffffff !important;
+  background: #252d4b !important;
+  border: 1px solid #59617c;
+  border-radius: 8px;
+  cursor: pointer;
+  z-index: 1005;
+}
+.app-shell .sidebar .sidebar-close-btn:hover {
+  background: rgba(128, 128, 128, 0.35);
 }
