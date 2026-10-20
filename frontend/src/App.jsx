@@ -24,12 +24,14 @@ import {
   Clock,
   Eye,
   HeartPulse,
+  Pill,
 } from "lucide-react";
 
 import Login from "./Login";
 import { auth } from "./firebase";
 import { useAppointmentNotifications } from "./useAppointmentNotifications";
 import { useMedicineNotifications } from "./useMedicineNotifications";
+import MediLensDashboard from "./MediLensDashboard";
 const API_BASE =
 import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000";
 const API_BASE_URL = "https://ai-personal-health-copilot-ty75.vercel.app";
@@ -1134,6 +1136,11 @@ function addSelectedFiles(fileList) {
       subtitle:
         "View your saved medical reports and health history.",
     },
+    medilens: {
+      title: "MediLens AI",
+      subtitle:
+        "Understand and organize your medical records with AI.",
+    },
   };
 
   const currentPage =
@@ -1237,6 +1244,16 @@ function addSelectedFiles(fileList) {
           >
             <CalendarDays size={20} />
             Health Timeline
+          </button>
+          <button
+            className={`nav-item ${activePage === "medilens" ? "active" : ""}`}
+            onClick={() => {
+              setActivePage("medilens");
+              setIsSidebarOpen(false);
+            }}
+          >
+            <Eye size={20} />
+            MediLens AI
           </button>
         </nav>
 
@@ -2097,6 +2114,7 @@ function addSelectedFiles(fileList) {
             </div>
           </section>
         )}
+        {activePage === "medilens" && <MediLensDashboard />}
       </main>
 
       {showSignOutModal && (

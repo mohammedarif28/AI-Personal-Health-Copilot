@@ -5,6 +5,8 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
+from reminder_manager import router as reminder_router
+from medicine_service import search_medicine
 
 from database import (
     initialize_database,
@@ -56,6 +58,7 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:5173",
         "http://localhost:5174",
+        "http://127.0.0.1:5173",
         "https://ai-personal-health-copilot.vercel.app",
         "https://ai-personal-health-copilot-ty75.vercel.app",
     ],
@@ -105,6 +108,11 @@ class ReminderRequest(BaseModel):
     medicine: str = Field(min_length=1, max_length=200)
     schedule: str = Field(min_length=1, max_length=200)
     notes: str = Field(default="", max_length=2000)
+
+
+class MedicineDecoderRequest(BaseModel):
+    medicine_name: str = Field(min_length=1, max_length=150)
+    language: str = Field(default="Auto-detect", max_length=50)
 
 
 # --------------------------------------------------
@@ -223,6 +231,127 @@ def symptoms(request: ChatRequest):
             "used_rag": False,
         }
 
+    except Exception as exc:
+        safe_error(exc)
+
+
+# --------------------------------------------------
+# MediLens AI - Medicine Decoder
+# --------------------------------------------------
+
+@app.post("/medicine-decoder")
+def medicine_decoder(request: MedicineDecoderRequest):
+    try:
+        medicine_name = request.medicine_name.strip()
+
+        if not medicine_name:
+            raise ValueError("Please enter a medicine name.")
+
+        # Retrieve information from the external drug-label source.
+        medicine_data = search_medicine(medicine_name)
+
+        # Do not generate an explanation when the source finds no match.
+        if not medicine_data.get("found"):
+            return {
+                "found": False,
+                "medicine_name": medicine_name,
+                "answer": (
+                    "No matching medicine label was found in the "
+                    "available database. This does not mean the medicine "
+                    "is unavailable or unapproved in India. Check the "
+                    "spelling and verify the package with a pharmacist."
+                ),
+                "source": medicine_data.get("source"),
+                "results": [],
+            }
+
+        import json
+
+        # Limit the amount of label information sent to the AI.
+        limited_results = []
+
+        for item in medicine_data.get("results", [])[:3]:
+            limited_item = {}
+
+            for key, value in item.items():
+                if isinstance(value, list):
+                    limited_item[key] = [
+                        str(text)[:1500] for text in value[:2]
+                    ]
+                else:
+                    limited_item[key] = str(value)[:1500]
+
+            limited_results.append(limited_item)
+
+        medicine_context = json.dumps(
+            limited_results,
+            ensure_ascii=False
+        )[:10000]
+
+        # Keep the explanation grounded in retrieved label information.
+        
+        prompt = (
+             "You are MediLens AI, a medicine information assistant. "
+             "Explain medicine-label information in simple language.\n\n"
+
+             "STRICT RULES:\n"
+             "- Use only the supplied label data for medicine-specific claims.\n"
+             "- Do not assume the search result is the user's exact product.\n"
+             "- Clearly distinguish a single-ingredient medicine from a combination medicine.\n"
+             "- Never combine information from different products into one summary.\n"
+             "- Do not invent ingredients, strengths, uses, side effects, or warnings.\n"
+             "- Do not prescribe a dose or recommend changing treatment.\n"
+             "- Include dosage information only when clearly supported by the label, "
+             "and identify the exact formulation and patient group it applies to.\n"
+             "- If product identity or strength is uncertain, say so clearly.\n"
+             "- Explain that US label information may differ from Indian products.\n"
+             "- Recommend consulting a doctor or pharmacist for personal advice.\n"
+             "- If information is missing, say the label did not provide it.\n"
+             "- Reply in the requested language.\n\n"
+
+             "OUTPUT FORMAT:\n"
+             "Use these headings, omitting a section if the source has no relevant data:\n"
+             "**Medicine Overview**\n"
+             "Give a brief explanation of the medicine and whether the exact product is confirmed.\n\n"
+             "**Active Ingredients**\n"
+             "List the ingredients supported by the selected product label.\n\n"
+             "**What It Is Used For**\n"
+             "Give no more than 4 concise bullet points.\n\n"
+             "**Common Side Effects**\n"
+             "List only side effects supported by the selected label, up to 5 items.\n\n"
+             "**Important Warnings**\n"
+             "Summarize the most important supported warnings in no more than 4 bullets.\n\n"
+             "**Dosage and Instructions**\n"
+             "Do not give a personal dose. Explain that dosing depends on the exact product "
+             "and prescription. Include label-specific details only when relevant and clear.\n\n"
+             "**Important Note**\n"
+             "Briefly explain any uncertainty and advise checking with a healthcare professional.\n\n"
+             "Keep the complete answer concise, ideally under 350 words. "
+             "Do not reproduce long passages from the source label. "
+             "Do not create tables. Do not repeat the same fact in multiple sections.\n\n"
+
+             f"Requested language: {request.language}\n"
+             f"User-entered medicine name: {medicine_name}\n\n"
+             "Retrieved drug-label data:\n"
+             f"{medicine_context}"
+        )
+
+
+        answer = ask_health_copilot(
+            question=prompt,
+            language=request.language,
+        )
+
+        return {
+            "found": True,
+            "medicine_name": medicine_name,
+            "answer": answer,
+            "source": medicine_data.get("source"),
+            "results": medicine_data.get("results", []),
+        }
+
+    except HTTPException:
+        raise
     except Exception as exc:
         safe_error(exc)
 
