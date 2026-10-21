@@ -22,18 +22,33 @@ def search_medicine(medicine_name: str) -> dict:
     # Search fields in order, without maintaining a hardcoded alias list.
     escaped = name.replace("\\", "\\\\").replace('"', '\\"')
 
-    queries = [
-        (
-            f'openfda.brand_name:"{escaped}" OR '
-            f'openfda.generic_name:"{escaped}" OR '
-            f'openfda.substance_name:"{escaped}"'
-        ),
-        (
-            f'openfda.brand_name:{escaped} OR '
-            f'openfda.generic_name:{escaped} OR '
-            f'openfda.substance_name:{escaped}'
-        ),
-    ]
+    # US drug-label data commonly uses acetaminophen
+    # for the medicine known as paracetamol in India.
+    search_names = [name]
+
+    if name.casefold() == "paracetamol":
+        search_names.append("acetaminophen")
+
+    queries = []
+
+    for search_name in search_names:
+        escaped_name = (
+            search_name.replace("\\", "\\\\")
+            .replace('"', '\\"')
+        )
+
+        queries.extend([
+            (
+                f'openfda.brand_name:"{escaped_name}" OR '
+                f'openfda.generic_name:"{escaped_name}" OR '
+                f'openfda.substance_name:"{escaped_name}"'
+            ),
+            (
+                f'openfda.brand_name:{escaped_name} OR '
+                f'openfda.generic_name:{escaped_name} OR '
+                f'openfda.substance_name:{escaped_name}'
+            ),
+        ])
 
     results = []
     seen = set()
