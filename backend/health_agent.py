@@ -14,6 +14,7 @@ load_dotenv()
 
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
 GROQ_MODEL = os.getenv("GROQ_MODEL", "openai/gpt-oss-20b")
+GROQ_VISION_MODEL = os.getenv("GROQ_VISION_MODEL", "qwen/qwen3.8-27b")
 
 def get_client():
     if not GROQ_API_KEY or GROQ_API_KEY == "YOUR_GROQ_API_KEY":
@@ -239,13 +240,11 @@ def analyze_health_image(
     question: str,
     language: str = "Auto-detect",
 ) -> str:
-    vision_model = os.getenv("GROQ_VISION_MODEL", "").strip()
-
-    if not vision_model:
-        raise ValueError(
-            "Set GROQ_VISION_MODEL to a vision model available "
-            "to your Groq account."
-        )
+    vision_model = (
+        os.getenv("GROQ_VISION_MODEL", "").strip()
+        or GROQ_VISION_MODEL
+        or "qwen/qwen3.8-27b"
+    )
 
     if not image_data_url.startswith("data:image/"):
         raise ValueError("A valid image is required.")
@@ -354,12 +353,11 @@ def ask_health_copilot_with_attachments(
     # Use the normal text model unless images require a vision model.
     model = GROQ_MODEL
     if images:
-        model = os.getenv("GROQ_VISION_MODEL", "").strip()
-        if not model:
-            raise ValueError(
-                "Set GROQ_VISION_MODEL to a vision model available "
-                "to your Groq account."
-            )
+        model = (
+            os.getenv("GROQ_VISION_MODEL", "").strip()
+            or GROQ_VISION_MODEL
+            or "qwen/qwen3.8-27b"
+        )
     medical_document_rules = """
 You are a medical document explanation assistant.
 
