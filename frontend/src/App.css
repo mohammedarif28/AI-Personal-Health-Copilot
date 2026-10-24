@@ -1468,3 +1468,41 @@ body,
 .app-shell .sidebar .sidebar-close-btn:hover {
   background: rgba(128, 128, 128, 0.35);
 }
+/* ==========================================
+   GLOBAL WHITE CALENDAR & REMINDER ICONS
+   ========================================== */
+
+/* All date, time and reminder input fields */
+.app-shell input[type="date"],
+.app-shell input[type="datetime-local"],
+.app-shell input[type="time"],
+.app-shell input[type="month"],
+.app-shell input[type="week"] {
+  color-scheme: light !important;
+}
+
+/* Make every native calendar/time picker icon white */
+.app-shell input[type="date"]::-webkit-calendar-picker-indicator,
+.app-shell input[type="datetime-local"]::-webkit-calendar-picker-indicator,
+.app-shell input[type="time"]::-webkit-calendar-picker-indicator,
+.app-shell input[type="month"]::-webkit-calendar-picker-indicator,
+.app-shell input[type="week"]::-webkit-calendar-picker-indicator {
+  filter: invert(1) brightness(2) !important;
+  opacity: 1 !important;
+  cursor: pointer !important;
+}
+
+/* Hover effect */
+.app-shell input[type="date"]::-webkit-calendar-picker-indicator:hover,
+.app-shell input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover,
+.app-shell input[type="time"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 0.75 !important;
+}
+
+/* White calendar SVG icons inside dark reminder buttons */
+.app-shell .reminder-button svg,
+.app-shell .calendar-button svg,
+.app-shell .date-picker-button svg {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+}
