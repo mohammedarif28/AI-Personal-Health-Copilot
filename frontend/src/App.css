@@ -1,0 +1,1470 @@
+.appointment-alert {
+  margin: 12px 20px;
+  padding: 12px 16px;
+  border: 1px solid #eab308;
+  border-radius: 8px;
+  background: #fef9c3;
+  color: #713f12;
+  font-weight: 500;
+}
+
+.timeline-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.timeline-card {
+  display: flex;
+  gap: 14px;
+  padding: 18px;
+  border: 1px solid var(--border-color, #dfe3e8);
+  border-radius: 14px;
+}
+
+.timeline-marker {
+  flex-shrink: 0;
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--surface-secondary, #f0f3f7);
+}
+
+.timeline-card-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.timeline-card-content h3,
+.report-detail h3 {
+  margin-top: 0;
+  overflow-wrap: anywhere;
+}
+
+.timeline-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.report-detail {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-color, #dfe3e8);
+}
+
+.report-summary {
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+.extracted-report-text {
+  padding: 14px;
+  border-radius: 10px;
+  background: var(--surface-secondary, #f5f6f8);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-height: 400px;
+  overflow-y: auto;
+  font-size: 13px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 36px 16px;
+}
+
+@media (max-width: 600px) {
+  .timeline-card {
+    padding: 12px;
+  }
+
+  .timeline-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+.health-timeline {
+  width: 100%;
+  max-width: 1050px;
+  margin: 0 auto;
+  padding: 28px;
+  background: #ffffff;
+  border: 1px solid #e1e8f0;
+  border-radius: 22px;
+  box-sizing: border-box;
+  color: #172b4d;
+}
+
+.timeline-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-bottom: 12px;
+}
+
+.timeline-title {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.timeline-title>svg {
+  color: #11966e;
+  flex-shrink: 0;
+}
+
+.timeline-title h2 {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  color: #17345b;
+}
+
+.timeline-refresh {
+  border: 1px solid #cbd8e6;
+  border-radius: 9px;
+  background: #ffffff;
+  color: #23446a;
+  padding: 10px 17px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.timeline-refresh:hover:not(:disabled) {
+  background: #f0f8f5;
+  border-color: #11966e;
+}
+
+.timeline-refresh:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.timeline-description {
+  margin: 18px 0 25px;
+  color: #7588a3;
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.timeline-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.timeline-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 17px;
+  padding: 22px;
+  border: 1px solid #e1e9f2;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 3px 12px rgba(25, 50, 85, 0.04);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.timeline-card:hover {
+  border-color: #b9d9cf;
+  box-shadow: 0 5px 18px rgba(25, 50, 85, 0.07);
+}
+
+.timeline-card-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  color: #25476f;
+  background: #f0f5fa;
+  border-radius: 12px;
+}
+
+.timeline-card-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.timeline-card-content>h3 {
+  margin: 1px 0 10px;
+  color: #18385f;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.timeline-document-type {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 10px;
+  border-radius: 7px;
+  background: #f1f6fb;
+  color: #4d6683;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.timeline-upload-date {
+  margin: 13px 0 17px;
+  color: #8292a9;
+  font-size: 13px;
+}
+
+.timeline-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.timeline-view-button,
+.timeline-delete-button,
+.timeline-close-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 39px;
+  padding: 9px 14px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.timeline-view-button {
+  color: #ffffff;
+  background: #157a60;
+}
+
+.timeline-view-button:hover {
+  background: #10664f;
+}
+
+.timeline-delete-button {
+  color: #bd3c43;
+  background: #fff5f5;
+  border-color: #f2d5d7;
+}
+
+.timeline-delete-button:hover {
+  background: #ffe8e8;
+}
+
+.timeline-close-button {
+  min-height: 34px;
+  color: #415a78;
+  background: #f0f4f8;
+  border-color: #dce5ee;
+}
+
+.timeline-close-button:hover {
+  background: #e3ebf3;
+}
+
+.timeline-report-details {
+  margin-top: 22px;
+  padding: 20px;
+  background: #f8fafc;
+  border: 1px solid #e1e8f0;
+  border-radius: 12px;
+}
+
+.timeline-details-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.timeline-report-details h4 {
+  margin: 16px 0 10px;
+  color: #25476f;
+  font-size: 15px;
+}
+
+.timeline-details-heading h4 {
+  margin: 0;
+}
+
+.timeline-summary {
+  color: #435873;
+  font-size: 14px;
+  line-height: 1.8;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.timeline-extracted-text {
+  max-height: 350px;
+  overflow: auto;
+  padding: 15px;
+  border-radius: 9px;
+  border: 1px solid #e0e7ef;
+  background: #ffffff;
+  color: #42536a;
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1.8;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.timeline-empty,
+.timeline-status {
+  padding: 38px 20px;
+  text-align: center;
+  color: #788aa2;
+}
+
+.timeline-empty {
+  border: 1px dashed #ccd9e6;
+  border-radius: 15px;
+  background: #f9fbfd;
+}
+
+.timeline-empty svg {
+  color: #11966e;
+}
+
+.timeline-empty h3 {
+  margin: 13px 0 8px;
+  color: #25476f;
+}
+
+.timeline-empty p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.timeline-error {
+  margin: 16px 0;
+  padding: 13px 16px;
+  border: 1px solid #f0c8cb;
+  border-radius: 10px;
+  background: #fff4f4;
+  color: #b4232d;
+  font-size: 14px;
+}
+
+/* Mobile layout */
+@media (max-width: 600px) {
+  .health-timeline {
+    padding: 18px;
+    border-radius: 15px;
+  }
+
+  .timeline-title {
+    gap: 10px;
+  }
+
+  .timeline-title h2 {
+    font-size: 21px;
+  }
+
+  .timeline-card {
+    gap: 12px;
+    padding: 15px;
+  }
+
+  .timeline-card-icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .timeline-card-content>h3 {
+    font-size: 15px;
+  }
+
+  .timeline-actions {
+    align-items: stretch;
+  }
+
+  .timeline-view-button,
+  .timeline-delete-button {
+    padding: 9px 10px;
+  }
+}
+
+/* Minimize the Enable Notifications button */
+.page-header>.primary-button {
+  width: auto;
+  min-width: 0;
+  flex: 0 0 auto;
+  padding: 10px 16px;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+/* =====================================
+   CHAT SCREEN - FIXED HEIGHT LAYOUT
+   ===================================== */
+
+/* Prevent the entire application from scrolling */
+.app-shell {
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+/* Keep the main area within the viewport */
+.main-content {
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+/* Keep the page header at the top */
+.page-header {
+  flex-shrink: 0;
+}
+
+/* Keep status and alerts from shrinking unpredictably */
+.main-content>.muted-text,
+.main-content>.error-banner,
+.main-content>.appointment-alert {
+  flex-shrink: 0;
+}
+
+/* Chat panel fills remaining space */
+.chat-panel {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ONLY the messages area scrolls */
+.chat-messages {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  padding: 20px;
+  scroll-behavior: smooth;
+}
+
+/* Composer stays at the bottom */
+.chat-composer {
+  flex-shrink: 0;
+  position: relative;
+  bottom: auto;
+  width: 100%;
+  box-sizing: border-box;
+  background: #ffffff;
+  border-top: 1px solid #e2e8f0;
+  padding: 14px 20px 10px;
+  z-index: 5;
+}
+
+/* Keep the message form at the bottom of the composer */
+.message-form {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.message-form textarea {
+  flex: 1;
+  min-width: 0;
+  max-height: 140px;
+  overflow-y: auto;
+  resize: none;
+  box-sizing: border-box;
+}
+
+/* Keep disclaimer below the input */
+.chat-disclaimer {
+  margin: 8px 0 0;
+  text-align: center;
+}
+
+/* Make the sidebar independently scrollable if necessary */
+.sidebar {
+  height: 100vh;
+  height: 100dvh;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+/* Smaller screens */
+@media (max-width: 768px) {
+  .main-content {
+    padding-bottom: 0;
+  }
+
+  .chat-composer {
+    padding: 10px 12px;
+  }
+
+  .chat-messages {
+    padding: 12px;
+  }
+}
+
+/* Health Copilot: White + Blue + Purple Theme */
+
+body,
+#root {
+  background: #ffffff;
+  color: #111827;
+  min-height: 100%;
+}
+
+.app-shell {
+  background: linear-gradient(135deg,
+      #ffffff 0%,
+      #f5f8ff 55%,
+      #f6f0ff 100%);
+  color: #111827;
+}
+
+.sidebar {
+  background: linear-gradient(180deg,
+      #ffffff 0%,
+      #f5f8ff 65%,
+      #f4edff 100%);
+  border-right: 1px solid #e0e7ff;
+}
+
+.main-content {
+  background: transparent;
+  color: #111827;
+}
+
+.page-header,
+.chat-panel,
+.chat-messages,
+.chat-composer {
+  background-color: #ffffff;
+  color: #111827;
+}
+
+.primary-button,
+.send-button {
+  background: linear-gradient(135deg, #2563eb, #7c3aed);
+  color: #ffffff;
+  border: none;
+}
+
+.primary-button:hover,
+.send-button:hover {
+  filter: brightness(1.08);
+}
+
+.secondary-button {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 1px solid #dbeafe;
+}
+
+.chat-composer {
+  border-top: 1px solid #e0e7ff;
+}
+
+input,
+textarea,
+select {
+  background-color: #ffffff;
+  color: #111827;
+  border-color: #dbe3f0;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+}
+
+button {
+  transition: background-color 0.2s ease, filter 0.2s ease;
+}
+
+/* ===== FULL HEALTH COPILOT THEME FIX ===== */
+
+html,
+body,
+#root {
+  margin: 0 !important;
+  width: 100% !important;
+  min-height: 100% !important;
+  background: #ffffff !important;
+  color: #111827 !important;
+}
+
+.app-shell {
+  width: 100% !important;
+  min-height: 100vh !important;
+  background: linear-gradient(135deg,
+      #ffffff 0%,
+      #eff6ff 50%,
+      #f3e8ff 100%) !important;
+  color: #111827 !important;
+}
+
+/* LEFT SIDEBAR */
+.app-shell .sidebar {
+  background: linear-gradient(180deg,
+      #ffffff 0%,
+      #eff6ff 60%,
+      #f3e8ff 100%) !important;
+  color: #111827 !important;
+  border-right: 1px solid #dbeafe !important;
+}
+
+/* SIDEBAR TEXT */
+.app-shell .sidebar h1,
+.app-shell .sidebar h2,
+.app-shell .sidebar p,
+.app-shell .sidebar span {
+  color: #111827 !important;
+}
+
+/* RIGHT CONTENT */
+.app-shell .main-content {
+  background: transparent !important;
+  color: #111827 !important;
+}
+
+/* CHAT AND OTHER PANELS */
+.app-shell .chat-panel,
+.app-shell .chat-messages,
+.app-shell .chat-composer,
+.app-shell .page-header {
+  color: #111827 !important;
+}
+
+/* INPUTS */
+.app-shell input,
+.app-shell textarea,
+.app-shell select {
+  background: #ffffff !important;
+  color: #111827 !important;
+  border-color: #cbd5e1 !important;
+}
+
+/* BLUE-PURPLE BUTTONS */
+.app-shell .primary-button,
+.app-shell .send-button {
+  background: linear-gradient(135deg,
+      #2563eb,
+      #7c3aed) !important;
+  color: #ffffff !important;
+  border: none !important;
+}
+
+/* SECONDARY BUTTONS */
+.app-shell .secondary-button {
+  background: #eff6ff !important;
+  color: #1d4ed8 !important;
+  border: 1px solid #bfdbfe !important;
+}
+
+/* Background only — preserve existing UI styling */
+.app-shell {
+  background:
+    radial-gradient(ellipse at 10% 100%,
+      rgba(91, 33, 182, 0.30),
+      transparent 45%),
+    radial-gradient(ellipse at 90% 0%,
+      rgba(37, 99, 235, 0.25),
+      transparent 45%),
+    linear-gradient(135deg,
+      #080b18 0%,
+      #101a36 50%,
+      #1b1033 100%) !important;
+}
+
+/* FIX WHITE AREAS — HEALTH COPILOT BACKGROUND ONLY */
+
+/* Header */
+.app-shell .page-header {
+  background: linear-gradient(110deg,
+      #0b1020,
+      #14234a,
+      #251342) !important;
+  color: #f1f5ff !important;
+}
+
+/* Chat conversation panel */
+.app-shell .chat-panel,
+.app-shell .chat-messages {
+  background: linear-gradient(145deg,
+      #0b1020,
+      #101a36,
+      #1b1235) !important;
+  color: #f1f5ff !important;
+}
+
+/* Bottom composer area */
+.app-shell .chat-composer {
+  background: linear-gradient(110deg,
+      #0b1020,
+      #142044,
+      #211339) !important;
+  color: #f1f5ff !important;
+}
+
+/* Message input */
+.app-shell .message-form,
+.app-shell .message-form textarea {
+  background: #10172d !important;
+  color: #f1f5ff !important;
+}
+
+/* Preserve readable text */
+.app-shell .chat-panel h1,
+.app-shell .chat-panel h2,
+.app-shell .chat-panel p,
+.app-shell .chat-panel strong,
+.app-shell .page-header h1,
+.app-shell .page-header p {
+  color: #e6eaff !important;
+}
+
+/* Keep borders subtle */
+.app-shell .chat-composer,
+.app-shell .chat-messages {
+  border-color: #30365e !important;
+}
+
+/* ===== REMOVE WHITE UI ELEMENTS ===== */
+
+/* Sidebar / navbar */
+.app-shell .sidebar,
+.app-shell aside {
+  background: linear-gradient(180deg,
+      #0b1020 0%,
+      #111b3b 55%,
+      #211338 100%) !important;
+  color: #e8edff !important;
+  border-color: #303565 !important;
+}
+
+/* Chat area */
+.app-shell .chat-panel,
+.app-shell .chat-messages {
+  background: linear-gradient(135deg,
+      #0b1020 0%,
+      #111a35 55%,
+      #201337 100%) !important;
+  color: #e8edff !important;
+}
+
+/* User message bubble — replace white with dark blue */
+.app-shell .user-message,
+.app-shell .message.user,
+.app-shell [class*="user-message"] {
+  background: #192747 !important;
+  color: #e8edff !important;
+  border-color: #354778 !important;
+}
+
+/* Composer and text area */
+.app-shell .chat-composer,
+.app-shell .message-form,
+.app-shell .message-form textarea,
+.app-shell textarea,
+.app-shell input {
+  background: #10172d !important;
+  color: #f1f5ff !important;
+  border-color: #343e68 !important;
+}
+
+/* Report, Medical Image, Voice Input, New Chat buttons */
+.app-shell .composer-tools button,
+.app-shell .chat-composer button,
+.app-shell .secondary-button {
+  background: linear-gradient(135deg,
+      #17264a,
+      #29204b) !important;
+  color: #e2e8ff !important;
+  border: 1px solid #424879 !important;
+}
+
+/* Response language dropdown */
+.app-shell .page-header select,
+.app-shell select {
+  background: #151c35 !important;
+  color: #e8edff !important;
+  border-color: #424879 !important;
+}
+
+/* Prevent white backgrounds on common chat elements */
+.app-shell .chat-panel *,
+.app-shell .chat-messages * {
+  scrollbar-color: #5550a4 #11172b;
+}
+
+.app-shell .chat-messages::-webkit-scrollbar-track {
+  background: #11172b !important;
+}
+
+.app-shell .chat-messages::-webkit-scrollbar-thumb {
+  background: #5550a4 !important;
+  border-radius: 8px;
+}
+
+/* Bottom composer */
+.app-shell .chat-composer {
+  background: linear-gradient(110deg,
+      #0b1020,
+      #121b38,
+      #201337) !important;
+  border-top: 1px solid #303565 !important;
+}
+
+/* ===== CHAT AREA ONLY: BLACK + BLUE + PURPLE ===== */
+
+/* Main conversation box */
+.app-shell .chat-panel {
+  background: linear-gradient(145deg,
+      #0b1226 0%,
+      #111b3a 48%,
+      #211439 100%) !important;
+  color: #edf2ff !important;
+}
+
+/* Scrolling conversation area */
+.app-shell .chat-messages {
+  background: linear-gradient(145deg,
+      #0b1226 0%,
+      #111b3a 48%,
+      #211439 100%) !important;
+  color: #edf2ff !important;
+}
+
+/* User message row — remove the blue-gray strip */
+.app-shell .chat-messages .message-row:has(.user-message),
+.app-shell .chat-messages .user-message {
+  background: #1b2345 !important;
+  color: #edf2ff !important;
+  border: 1px solid #424778 !important;
+}
+
+/* User message bubble */
+.app-shell .chat-messages .user-message p,
+.app-shell .chat-messages .user-message div,
+.app-shell .chat-messages [class*="user-message"] {
+  background: #20294d !important;
+  color: #f1f5ff !important;
+  border-color: #454c82 !important;
+}
+
+/* All message text */
+.app-shell .chat-messages p,
+.app-shell .chat-messages li,
+.app-shell .chat-messages td,
+.app-shell .chat-messages th {
+  color: #e5eaff !important;
+}
+
+/* User and assistant names */
+.app-shell .chat-messages strong,
+.app-shell .chat-messages b {
+  color: #c4b5fd !important;
+}
+
+/* Assistant message headings */
+.app-shell .chat-messages h1,
+.app-shell .chat-messages h2,
+.app-shell .chat-messages h3,
+.app-shell .chat-messages h4 {
+  color: #a5c8ff !important;
+}
+
+/* Composer background */
+.app-shell .chat-composer {
+  background: linear-gradient(110deg,
+      #0b1226,
+      #111b3a,
+      #211439) !important;
+  border-top: 1px solid #343b68 !important;
+}
+
+/* Message input */
+.app-shell .chat-composer textarea {
+  background: #11182f !important;
+  color: #f1f5ff !important;
+  border: 1px solid #3b456f !important;
+}
+
+.app-shell .chat-composer textarea::placeholder {
+  color: #a4aecb !important;
+}
+
+/* Keep the existing toolbar layout, but remove white buttons */
+.app-shell .chat-composer .composer-tools button,
+.app-shell .chat-composer .secondary-button {
+  background: #202044 !important;
+  color: #dbeafe !important;
+  border: 1px solid #454477 !important;
+}
+
+/* Send button */
+.app-shell .chat-composer .send-button {
+  background: linear-gradient(135deg,
+      #3478f6,
+      #8957e5) !important;
+  color: #ffffff !important;
+}
+
+/* Disclaimer */
+.app-shell .chat-composer .chat-disclaimer {
+  color: #aeb9d8 !important;
+}
+
+/* ===== USER PROFILE BOX ONLY ===== */
+
+.app-shell .sidebar .profile-card {
+  background: linear-gradient(135deg,
+      #101a35 0%,
+      #19264a 55%,
+      #2a1748 100%) !important;
+  border: 1px solid #3b4678 !important;
+  color: #f1f5ff !important;
+}
+
+/* Profile name */
+.app-shell .sidebar .profile-card h3,
+.app-shell .sidebar .profile-card h4,
+.app-shell .sidebar .profile-card strong {
+  color: #f1f5ff !important;
+}
+
+/* Profile email and other details */
+.app-shell .sidebar .profile-card p,
+.app-shell .sidebar .profile-card span {
+  color: #c4cde8 !important;
+}
+
+/* User ID / avatar icon container */
+.app-shell .sidebar .profile-card svg,
+.app-shell .sidebar .profile-card .user-icon {
+  color: #a5b4fc !important;
+}
+
+/* Profile action button */
+.app-shell .sidebar .profile-card button {
+  background: linear-gradient(135deg,
+      #1d4ed8,
+      #6d28d9) !important;
+  color: #ffffff !important;
+  border-color: #5552a0 !important;
+}
+
+/* =========================================
+   FIX SIDEBAR TEXT VISIBILITY
+   Recent Chats + App Branding + Navigation
+========================================= */
+
+/* Health Copilot title and subtitle */
+.sidebar .logo,
+.sidebar .brand,
+.sidebar .brand h1,
+.sidebar .brand h2,
+.sidebar .brand p,
+.sidebar .app-title,
+.sidebar .app-subtitle {
+  color: #ffffff !important;
+}
+
+/* Recent Chats heading */
+.sidebar .recent-chats-title,
+.sidebar .recent-chats-heading,
+.sidebar [class*="recent-chats"] h3,
+.sidebar [class*="recent-chats"] h4 {
+  color: #ffffff !important;
+}
+
+/* Recent chat history text */
+.sidebar .recent-chat,
+.sidebar .recent-chat span,
+.sidebar .recent-chat p,
+.sidebar .chat-item,
+.sidebar .chat-item span,
+.sidebar .chat-item p,
+.sidebar [class*="chat-history"],
+.sidebar [class*="chat-history"] span,
+.sidebar [class*="chat-history"] p,
+.sidebar [class*="recent-chat"],
+.sidebar [class*="recent-chat"] span,
+.sidebar [class*="recent-chat"] p {
+  color: #3897f1 !important;
+}
+
+/* Recent chat icons and action buttons */
+.sidebar [class*="recent-chat"] svg,
+.sidebar [class*="chat-history"] svg,
+.sidebar [class*="chat-item"] svg {
+  color: #085381 !important;
+}
+
+/* Navigation labels */
+.sidebar nav a,
+.sidebar nav button,
+.sidebar nav a span,
+.sidebar nav button span {
+  color: #e2e8f0 !important;
+}
+
+/* Workspace and sidebar section headings */
+.sidebar .section-title,
+.sidebar .sidebar-heading,
+.sidebar [class*="section-heading"] {
+  color: #b0e1cb !important;
+}
+
+/* Recent chat hover */
+.sidebar [class*="recent-chat"]:hover,
+.sidebar [class*="chat-history"]:hover,
+.sidebar [class*="chat-item"]:hover {
+  background-color: #263451 !important;
+}
+
+/* Preserve readable text in the light-green health notice */
+.sidebar .health-notice,
+.sidebar .health-notice p,
+.sidebar .health-notice span,
+.sidebar .health-notice strong {
+  color: #064e3b !important;
+}
+
+/* Preserve selected navigation item's existing appearance */
+.sidebar .nav-item.active,
+.sidebar nav a.active {
+  color: #ff4d35 !important;
+}
+
+/* FIX: NAVBAR OPTIONS MUST REMAIN VISIBLE ON HOVER */
+
+.sidebar nav a,
+.sidebar nav button,
+.sidebar .nav-item,
+.sidebar .nav-item a {
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Hovered option */
+.sidebar nav a:hover,
+.sidebar nav button:hover,
+.sidebar .nav-item:hover,
+.sidebar .nav-item a:hover {
+  background-color: #263451 !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  opacity: 1 !important;
+}
+
+/* Keep nested text visible */
+.sidebar nav a:hover *,
+.sidebar nav button:hover *,
+.sidebar .nav-item:hover *,
+.sidebar .nav-item a:hover * {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Keep icons visible */
+.sidebar nav a:hover svg,
+.sidebar nav button:hover svg,
+.sidebar .nav-item:hover svg {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.selected-attachments {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  max-height: 150px;
+  overflow-y: auto;
+  margin: 0 0 12px;
+}
+
+.selected-attachment {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  max-width: 260px;
+  min-width: 0;
+  padding: 9px 11px;
+  border: 1px solid #dbe3f0;
+  border-radius: 12px;
+  background: #f8faff;
+  color: #334155;
+}
+
+.attachment-details {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 3px;
+}
+
+.attachment-details span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 175px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.attachment-details small {
+  color: #64748b;
+  font-size: 11px;
+}
+
+.remove-attachment {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: #64748b;
+  cursor: pointer;
+  padding: 5px;
+}
+
+.remove-attachment:hover {
+  background: #e2e8f0;
+  color: #b91c1c;
+}
+
+@media (max-width: 600px) {
+  .selected-attachment {
+    max-width: 100%;
+  }
+
+  .attachment-details span {
+    max-width: 150px;
+  }
+}
+
+/* Reduce extra spacing in AI chat responses */
+.app-shell .chat-messages .health-response p {
+  margin-top: 0 !important;
+  margin-bottom: 4px !important;
+  line-height: 1.4 !important;
+}
+
+.app-shell .chat-messages .health-response h1,
+.app-shell .chat-messages .health-response h2,
+.app-shell .chat-messages .health-response h3,
+.app-shell .chat-messages .health-response h4 {
+  margin-top: 8px !important;
+  margin-bottom: 4px !important;
+  line-height: 1.4 !important;
+}
+
+.app-shell .chat-messages .health-response ul,
+.app-shell .chat-messages .health-response ol {
+  margin-top: 2px !important;
+  margin-bottom: 4px !important;
+  padding-left: 20px !important;
+}
+
+.app-shell .chat-messages .health-response li {
+  margin-bottom: 1px !important;
+}
+
+.app-shell .chat-messages .health-response li p {
+  margin-bottom: 0 !important;
+}
+
+/* Reduce excessive spacing in AI responses */
+.app-shell .ai-response-box p {
+  margin-top: 0 !important;
+  margin-bottom: 4px !important;
+  line-height: 1.4 !important;
+}
+
+.app-shell .ai-response-box h1,
+.app-shell .ai-response-box h2,
+.app-shell .ai-response-box h3,
+.app-shell .ai-response-box h4 {
+  margin-top: 8px !important;
+  margin-bottom: 4px !important;
+  line-height: 1.4 !important;
+}
+
+.app-shell .ai-response-box ul,
+.app-shell .ai-response-box ol {
+  margin-top: 2px !important;
+  margin-bottom: 4px !important;
+  padding-left: 22px !important;
+}
+
+.app-shell .ai-response-box li {
+  margin-bottom: 1px !important;
+}
+
+.app-shell .ai-response-box li p {
+  margin-bottom: 0 !important;
+}
+
+.app-shell .ai-response-box> :first-child {
+  margin-top: 0 !important;
+}
+
+.app-shell .ai-response-box> :last-child {
+  margin-bottom: 0 !important;
+}
+
+/* ChatGPT-style AI response formatting */
+.ai-response-box {
+  font-size: 15px;
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+}
+
+.ai-response-box p {
+  margin: 0 0 12px !important;
+  line-height: 1.65 !important;
+}
+
+.ai-response-box h1,
+.ai-response-box h2,
+.ai-response-box h3,
+.ai-response-box h4 {
+  font-weight: 600;
+  line-height: 1.4 !important;
+  margin: 20px 0 8px !important;
+}
+
+.ai-response-box h1:first-child,
+.ai-response-box h2:first-child,
+.ai-response-box h3:first-child,
+.ai-response-box h4:first-child {
+  margin-top: 0 !important;
+}
+
+.ai-response-box ul,
+.ai-response-box ol {
+  margin: 4px 0 14px !important;
+  padding-left: 24px !important;
+}
+
+.ai-response-box li {
+  padding-left: 2px;
+  margin: 4px 0 !important;
+}
+
+.ai-response-box li p {
+  margin: 0 !important;
+}
+
+.ai-response-box strong {
+  font-weight: 650;
+}
+
+.ai-response-box blockquote {
+  margin: 12px 0;
+  padding: 4px 0 4px 14px;
+  border-left: 3px solid var(--border-color, #888);
+  opacity: 0.9;
+}
+
+.ai-response-box pre {
+  padding: 14px;
+  border-radius: 10px;
+  overflow-x: auto;
+  margin: 12px 0;
+}
+
+.ai-response-box code {
+  font-size: 0.9em;
+}
+
+.ai-response-box table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 12px 0;
+  display: block;
+  overflow-x: auto;
+}
+
+.ai-response-box th,
+.ai-response-box td {
+  padding: 8px 12px;
+  border: 1px solid var(--border-color, #888);
+  text-align: left;
+}
+
+.ai-response-box> :first-child {
+  margin-top: 0 !important;
+}
+
+.ai-response-box> :last-child {
+  margin-bottom: 0 !important;
+}
+
+/* Sidebar drawer improvements */
+
+.app-shell {
+  position: relative;
+  min-height: 100vh;
+}
+
+.menu-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 1002;
+}
+
+.sidebar-close-button {
+  display: none;
+}
+
+.sidebar-overlay {
+  display: none;
+}
+
+
+/* Mobile sidebar drawer */
+@media (max-width: 768px) {
+  .app-shell {
+    position: relative;
+  }
+
+  .app-shell .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: min(85vw, 320px);
+    height: 100dvh;
+    overflow-y: auto;
+    box-sizing: border-box;
+    z-index: 1001;
+    transform: translateX(-100%);
+    visibility: hidden;
+    transition: transform 0.25s ease, visibility 0.25s ease;
+  }
+
+  .app-shell .sidebar.sidebar-open {
+    transform: translateX(0);
+    visibility: visible;
+  }
+
+  .app-shell .sidebar-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    border: 0;
+    background: rgba(0, 0, 0, 0.55);
+    z-index: 1000;
+    cursor: pointer;
+  }
+
+  .app-shell .sidebar-close-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 1002;
+    cursor: pointer;
+  }
+
+  .app-shell .main-content {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+/* Desktop sidebar drawer */
+@media (min-width: 769px) {
+  .app-shell .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    height: 100vh;
+    width: 280px;
+    overflow-y: auto;
+    z-index: 1001;
+    transform: translateX(-100%);
+    visibility: hidden;
+    transition: transform 0.25s ease, visibility 0.25s ease;
+  }
+
+  .app-shell .sidebar.sidebar-open {
+    transform: translateX(0);
+    visibility: visible;
+  }
+
+  .app-shell .sidebar-overlay {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+    background: rgba(0, 0, 0, 0.45);
+    z-index: 1000;
+    cursor: pointer;
+  }
+
+  .app-shell.sidebar-is-open .sidebar-overlay {
+    display: block;
+  }
+}
+.app-shell .sidebar .sidebar-close-button {
+  display: flex !important;
+  position: absolute !important;
+  top: 12px !important;
+  right: 12px !important;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  color: #ffffff !important;
+  background: #252d4b !important;
+  border: 1px solid #59617c;
+  border-radius: 8px;
+  cursor: pointer;
+  z-index: 1005;
+}
+.app-shell .sidebar .sidebar-close-btn:hover {
+  background: rgba(128, 128, 128, 0.35);
+}
