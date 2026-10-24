@@ -74,8 +74,8 @@ def _ocr_with_vision(image: Image.Image) -> str:
     try:
         from health_agent import get_client
 
-        vision_model = os.getenv("GROQ_VISION_MODEL", "qwen/qwen3.8-27b").strip()
-        if not vision_model:
+        vision_model = (os.getenv("GROQ_VISION_MODEL") or "").strip()
+        if not vision_model or "llama-3.2" in vision_model or "preview" in vision_model:
             vision_model = "qwen/qwen3.8-27b"
 
         # Resize image if large to optimize transmission

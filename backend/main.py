@@ -128,15 +128,12 @@ def safe_error(exc: Exception):
             detail=message,
         )
 
-    # Avoid exposing credentials, provider responses, or internal details.
-    print(f"Health Copilot error: {type(exc).__name__}: {message}")
+    import traceback
+    traceback.print_exc()
 
     raise HTTPException(
         status_code=502,
-        detail=(
-            "The AI service could not complete this request. "
-            "Check your server configuration and model availability."
-        ),
+        detail=f"The AI service encountered an error: {message}",
     )
 
 

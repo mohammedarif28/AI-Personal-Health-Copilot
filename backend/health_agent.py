@@ -30,6 +30,33 @@ def get_client():
     )
 
 
+def safe_chat_completion(**kwargs):
+    client = get_client()
+    model = kwargs.get("model", "qwen/qwen3.8-27b")
+
+    # Automatically swap decommissioned models
+    if "llama-3.2" in model or "preview" in model:
+        model = "qwen/qwen3.8-27b"
+        kwargs["model"] = model
+
+    # Do not send reasoning_effort to models that do not support it
+    if "reasoning_effort" in kwargs and not any(k in model for k in ["o1", "o3"]):
+        kwargs.pop("reasoning_effort", None)
+
+    try:
+        return client.chat.completions.create(**kwargs)
+    except Exception as exc:
+        err_str = str(exc).lower()
+        if "decommissioned" in err_str or "not exist" in err_str or "model_not_found" in err_str or "404" in err_str:
+            fallback = "qwen/qwen3.8-27b"
+            if model != fallback:
+                print(f"Model {model} failed ({exc}). Retrying with {fallback}...")
+                kwargs["model"] = fallback
+                kwargs.pop("reasoning_effort", None)
+                return client.chat.completions.create(**kwargs)
+        raise
+
+
 
 SYSTEM_PROMPT = """
 You are Health Copilot, a friendly medical-report explanation assistant.
@@ -181,7 +208,7 @@ def ask_health_copilot(
         )
 
     try:
-        response = get_client().chat.completions.create(
+        response = safe_chat_completion(
             model=GROQ_MODEL,
             messages=[
     {
@@ -256,7 +283,7 @@ def analyze_health_image(
     else:
         language_instruction = f"Reply in {language}."
 
-    response = get_client().chat.completions.create(
+    response = safe_chat_completion(
         model=vision_model,
         messages=[
             {
@@ -287,7 +314,7 @@ def analyze_health_image(
             },
         ],
         temperature=0.2,
-        max_completion_tokens=1000,
+        max_completion_tokens=2500,
     )
 
     answer = response.choices[0].message.content
@@ -447,7 +474,7 @@ MEDICATION SAFETY:
         })
 
     
-    response = get_client().chat.completions.create(
+    response = safe_chat_completion(
         model=model,
         messages=[
             {
@@ -458,24 +485,22 @@ MEDICATION SAFETY:
         ],
         temperature=0.2,
         max_completion_tokens=3000,
-        reasoning_effort="low",
     )
 
     choice = response.choices[0]
-    answer = choice.message.content
+    answer = (choice.message.content or "").strip()
 
     print("Attachment model:", model)
     print("Finish reason:", choice.finish_reason)
-    print("Response content:", repr(answer))
-    print("Token usage:", response.usage)
+    print("Response length:", len(answer))
 
-    if not answer or not answer.strip():
-        raise RuntimeError(
-            f"Empty AI response. Model={model}, "
-            f"finish_reason={choice.finish_reason}, "
-            f"usage={response.usage}"
+    if not answer:
+        return (
+            "I could not detect any readable text or medical information "
+            "in the provided attachment(s). Please check that the image or "
+            "document is clear, well-lit, and legible."
         )
 
-    return answer.strip()
+    return answer
 
 
