@@ -110,7 +110,7 @@ def _ocr_with_vision(image: Image.Image) -> str:
                 }
             ],
             temperature=0.1,
-            max_completion_tokens=1500,
+            max_completion_tokens=600,
         )
         return (response.choices[0].message.content or "").strip()
     except Exception as exc:

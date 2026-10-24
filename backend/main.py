@@ -128,6 +128,15 @@ def safe_error(exc: Exception):
             detail=message,
         )
 
+    if "429" in message or "rate_limit" in message.lower() or "otpm" in message.lower():
+        raise HTTPException(
+            status_code=429,
+            detail=(
+                "The AI service output token rate limit was reached. "
+                "Please wait 15-30 seconds before submitting another request."
+            ),
+        )
+
     import traceback
     traceback.print_exc()
 

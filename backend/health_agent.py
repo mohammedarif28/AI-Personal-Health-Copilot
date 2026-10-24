@@ -43,16 +43,36 @@ def safe_chat_completion(**kwargs):
     if "reasoning_effort" in kwargs and not any(k in model for k in ["o1", "o3"]):
         kwargs.pop("reasoning_effort", None)
 
+    # For models with strict output token per minute limits (like qwen/qwen3.8-27b OTPM limit 1000 on Groq free tier),
+    # clamp max_completion_tokens so requests never exceed the enforced limit.
+    if "qwen" in model.lower():
+        requested_tokens = kwargs.get("max_completion_tokens") or kwargs.get("max_tokens") or 600
+        kwargs["max_completion_tokens"] = min(requested_tokens, 600)
+        kwargs.pop("max_tokens", None)
+
     try:
         return client.chat.completions.create(**kwargs)
     except Exception as exc:
         err_str = str(exc).lower()
+
+        # Handle 429 rate limit exceeded on OTPM by retrying with smaller token window
+        if "429" in err_str or "rate_limit" in err_str or "otpm" in err_str:
+            current_tokens = kwargs.get("max_completion_tokens", 600)
+            if current_tokens > 350:
+                print(f"OTPM rate limit encountered. Retrying with max_completion_tokens=350...")
+                import time
+                time.sleep(1)
+                kwargs["max_completion_tokens"] = 350
+                return client.chat.completions.create(**kwargs)
+
         if "decommissioned" in err_str or "not exist" in err_str or "model_not_found" in err_str or "404" in err_str:
             fallback = "qwen/qwen3.8-27b"
             if model != fallback:
                 print(f"Model {model} failed ({exc}). Retrying with {fallback}...")
                 kwargs["model"] = fallback
                 kwargs.pop("reasoning_effort", None)
+                if "qwen" in fallback.lower():
+                    kwargs["max_completion_tokens"] = min(kwargs.get("max_completion_tokens", 600), 600)
                 return client.chat.completions.create(**kwargs)
         raise
 
@@ -314,7 +334,7 @@ def analyze_health_image(
             },
         ],
         temperature=0.2,
-        max_completion_tokens=2500,
+        max_completion_tokens=600,
     )
 
     answer = response.choices[0].message.content
@@ -484,7 +504,7 @@ MEDICATION SAFETY:
             {"role": "user", "content": content},
         ],
         temperature=0.2,
-        max_completion_tokens=3000,
+        max_completion_tokens=600 if images else 1500,
     )
 
     choice = response.choices[0]
