@@ -1,0 +1,33 @@
+warning: in the working copy of '.gitignore', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/.gitignore', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/Dockerfile', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/database.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/file_utils.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/health_agent.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/main.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/medicine_service.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/ocr_utils.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/reminder_manager.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/requirements.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/test_ocr.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/vercel.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/index.html', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/package-lock.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/package.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/App.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/App.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/Login.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/Login.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/MediLensDashboard.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/MediLensDashboard.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/api.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/firebase.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/main.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/style.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/useAppointmentNotifications.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/useMedicineNotifications.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'package-lock.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'package.json', LF will be replaced by CRLF the next time Git touches it
+ .gitignore              |  1 [32m+[m
+ backend/health_agent.py | 22 [32m+++++++++++++++++++[m[31m---[m
+ 2 files changed, 20 insertions(+), 3 deletions(-)

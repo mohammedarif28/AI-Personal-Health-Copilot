@@ -448,6 +448,7 @@ MEDICATION SAFETY:
             "image_url": {"url": image_url},
         })
 
+    
     response = get_client().chat.completions.create(
         model=model,
         messages=[
@@ -458,10 +459,25 @@ MEDICATION SAFETY:
             {"role": "user", "content": content},
         ],
         temperature=0.2,
-        max_completion_tokens=1000,
+        max_completion_tokens=3000,
+        reasoning_effort="low",
     )
 
-    answer = response.choices[0].message.content
+    choice = response.choices[0]
+    answer = choice.message.content
+
+    print("Attachment model:", model)
+    print("Finish reason:", choice.finish_reason)
+    print("Response content:", repr(answer))
+    print("Token usage:", response.usage)
+
     if not answer or not answer.strip():
-        raise RuntimeError("The AI returned an empty response.")
+        raise RuntimeError(
+            f"Empty AI response. Model={model}, "
+            f"finish_reason={choice.finish_reason}, "
+            f"usage={response.usage}"
+        )
+
     return answer.strip()
+
+
