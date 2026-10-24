@@ -1,6 +1,16 @@
+
+import os
 import fitz
 import pytesseract
 from PIL import Image
+
+
+# Use the Windows executable locally.
+# On Render/Linux, Tesseract should be available through PATH.
+if os.name == "nt":
+    pytesseract.pytesseract.tesseract_cmd = (
+        r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+    )
 
 
 def extract_pdf_text_from_bytes(data: bytes) -> str:
